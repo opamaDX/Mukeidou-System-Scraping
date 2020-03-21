@@ -1,0 +1,2347 @@
+﻿
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<!--�-->
+
+<meta http-equiv="Content-Type" content="text/html; charset=euc-jp">
+<meta http-equiv="content-style-type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="X-UA-Compatible" content="IE=emulateIE7">
+<link rel="stylesheet" type="text/css" href="https://s.yimg.jp/images/auct/dev/yui/2_8_1/container.css">
+<link rel="stylesheet" type="text/css" href="https://s.yimg.jp/images/auct/dev/css/submit/1_0_1/pim_compose.css">
+<link rel="stylesheet" type="text/css" href="https://s.yimg.jp/images/auct/template/ui/auc_mod/css/00/comm/auct_common.css?1_3">
+<link rel="stylesheet" type="text/css" href="https://s.yimg.jp/images/auct/template/ui/auc_mod/css/00/comm/auct_ads.css?1_2">
+<link rel="stylesheet" type="text/css" href="https://s.yimg.jp/images/auct/template/ui/auc_mod/css/00/submit/2.1.1/auct_exhibitflow.css?1_21">
+<link rel="stylesheet" type="text/css" href="https://s.yimg.jp/images/auc/pc/exhibit/style/1.0.1/exhibit.css" media="all">
+<!--phtml input css-->
+
+
+<script type="text/javascript" src="https://s.yimg.jp/images/commerce/js/libs/jquery/core/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://s.yimg.jp/images/auct/dev/js/submit/2_1_3/submitformall.js"></script>
+<script type="text/javascript">
+<!--
+function toHankaku(c) {
+	var t = '';
+	for (i=0;i<c.value.length;i++) {
+		s=c.value.charCodeAt(i);
+		if ((0xff0f<s) && (s<0xff1a)) {
+			t+=String.fromCharCode(s-0xfee0);
+		} else {
+			t+=String.fromCharCode(s);
+		}
+	}
+	c.value = t;
+}
+//-->
+</script>
+<script type="text/javascript">
+	function codeCheckIE() {
+		if (/*@cc_on!@*/false) {
+			if (document.charset != "euc-jp") {
+				document.charset = "euc-jp";
+				location.reload();
+			}
+		}
+	}
+	function auction_tos() {
+		var config = {backgroundEl:"glayOutImg", okButton:"auc_insertion_ok", dialogEl:"insertion_dlg"};
+		config.okHandler = function(clickedId, obj) {
+			if (YAHOO.env.ua.ie) {
+				var HtmlEls =  document.getElementsByTagName("html");
+				YuD.setStyle(HtmlEls, "overflow", "scroll");
+			}
+			if (YAHOO.env.ua.gecko) {
+				var BodyEls =  document.getElementsByTagName("body");
+				YuD.setStyle(BodyEls, "overflow", "auto");
+			}
+			var q = document.createElement('input');
+			q.type = 'hidden';
+			q.id = "insertionOK";
+			q.value = "yes";
+			document.body.appendChild(q);
+		};
+		if (YAHOO.env.ua.ie) {
+			var HtmlEls =  document.getElementsByTagName("html");
+			YuD.setStyle(HtmlEls, "overflow", "hidden");
+		}
+		if (YAHOO.env.ua.gecko) {
+			var BodyEls =  document.getElementsByTagName("body");
+			YuD.setStyle(BodyEls, "overflow", "hidden");
+		}
+		new Ya.dialog("insertion_dlg", config);
+	}
+	function rebuildMask() {
+		if (!YuD.get("insertionOK") || YuD.get("insertionOK").value != "yes") {
+			YAHOO.auction.dialog.overlay["insertion_dlg"].buildMask();
+			YAHOO.auction.dialog.overlay["insertion_dlg"].showMask();
+		}
+	}
+	YuE.addListener(window, 'load', rebuildMask);
+</script>
+
+
+<title>ヤフオク! - 出品：商品情報入力</title>
+</head>
+<body class="yui-skin-sam">
+<div class="wrapper" id="yaucSellItemDiscrpt">
+
+
+<!--
+insertion
+-->
+<div id="insertion_dlg" style="display: none;">
+<div id="modDlgBox">
+<div class="modDlgBoxEle">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="untHead"><p class="pts01"><strong>ご注意</strong></p><div class="clr"></div></div>
+
+<div class="untBody">
+<p class="decTx01"><strong>以下の行為は禁止されています(出品削除や利用制限の対象となります)</strong><br>
+<a href="https://guide-ec.yahoo.co.jp/notice/rules/auc/detailed_regulations.html#A_21" target="new">システム利用料の支払回避行為について</a></p>
+<p class="decTx02">＜例＞</p>
+<ul>
+<li>「落札後に必要な個数をお知らせください」など、落札個数と実際の取引個数が異なる取引を行う旨を記載する行為</li>
+<li>「欲しい部品がありましたら質問ください」など、オークション上での落札を介さず直接取引を誘引する行為</li>
+<li>自動車車体、オートバイ車体、船体、水上オートバイを該当のカテゴリ以外で販売する行為</li>
+</ul>
+</div>
+
+<div class="untFoot">
+<table cellpadding="4" cellspacing="0" border="0" width="100%">
+<tr><td><div id="auc_insert_load">読み込み中</div></td></tr>
+<tr>
+<td align="center">
+<div id="auc_insert_form" style="display:none;">
+<table cellpadding="0" cellspacing="0">
+<tr>
+<form>
+<td>
+<input id="auc_insertion_cancel" onClick="Ya.submit(document.auction, 'https://page.auctions.yahoo.co.jp/jp/auction/k440307089');" type="button" value="キャンセル">
+</td>
+<td>&nbsp;</td>
+<td><input id="auc_insertion_ok" type="button" value="続ける"></td>
+</form>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--
+/insertion
+-->
+
+<!--
+MASTHEAD
+-->
+<div id="mastHead">
+<center>
+<table cellpadding="2" cellspacing="0" border="0" width="100%"><tr>
+<td width="1%"><a href="https://auctions.yahoo.co.jp/"><IMG SRC=https://s.yimg.jp/images/mh/pc/jp/rd/1.0.0/yahuoku.png WIDTH=134 ALT="ヤフオク!" HEIGHT=30 BORDER=0></a></td>
+<td width="99%" align="right" valign="bottom" nowrap>
+<small>
+<a href="https://www.yahoo.co.jp">Yahoo! JAPAN</a> -
+<a href="https://auctions.yahoo.co.jp/jp/show/entry_navi">オークション利用登録</a> -
+<a href="https://www.yahoo-help.jp/app/home/p/353/">ヘルプ</a>
+</small>
+<hr size="1" noshade>
+</td>
+</tr></table>
+</center>
+<br>
+</div>
+<!--
+/MASTHEAD
+-->
+
+<!--
+EMG
+-->
+
+
+<center>
+<!-- SpaceID=2084313790 loc=EMG3 noad-spid -->
+<!-- SpaceID=2084313790 loc=EMG2 noad-spid -->
+<!-- SpaceID=2084313790 loc=EMG noad-spid -->
+</center><br>
+<!--
+/EMG
+-->
+
+<!--
+JsOffAlert
+-->
+<noscript>
+<div id="libJsOffAlert">
+<div class="untBody">
+<p><em>現在JavaScriptの設定が無効になっています。</em></p>
+<p class="decTxt">すべての機能を利用するにはJavaScriptの設定を有効にしてください。<a href="https://www.yahoo-help.jp/app/noscript">JavaScriptの設定を変更する方法はこちら</a>。</p>
+</div>
+</div>
+</noscript>
+<!--
+/JsOffAlert
+-->
+
+<script type="text/javascript">
+auction_tos();
+</script>
+
+<!--
+LOGIN BAR
+-->
+<div id="modLoginBar">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<table border="0" cellspacing="0" cellpadding="0"><tr>
+<td class="decTd01"><p>
+<b>こんにちは、 mukeidou さん</b> （<a href="https://lh.login.yahoo.co.jp/?.done=https%3a%2f%2fauctions.yahoo.co.jp%2fpageinfo9%2fjp%2fshow%2fresubmit%3faID%3dk440307089">ログイン履歴</a> - <A HREF="https://points.yahoo.co.jp/book">利用可能ポイント</A>）
+</p></td>
+<td class="decTd02">
+<ul>
+<li><a href="https://storehome.auctions.yahoo.co.jp/jp/show/batchinfo">出品する</a>&nbsp;-&nbsp;</li>
+<li><a href="https://auctions.yahoo.co.jp/user/jp/show/mystatus">マイ・オークション</a>&nbsp;-&nbsp;</li>
+<li><a href="https://auctions.yahoo.co.jp/user/jp/show/prefs?.done=https://auctions.yahoo.co.jp/">オプション</a>&nbsp;-&nbsp;</li>
+<li><a href="https://login.yahoo.co.jp/config/login?.lg=jp&.intl=jp&logout=1&.src=auc&.done=https://auctions.yahoo.co.jp/">ログアウト</a></li>
+</ul>
+<div class="clr"></div>
+</td>
+</tr></table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--
+/LOGIN BAR
+-->
+
+<!--
+TITLE BAR
+-->
+<div id="modTitBar">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<table border="0" cellspacing="0" cellpadding="0"><tr><td>
+<h1 id="yellowBarTitle" property="auction:Title">ヤフオク! - 出品：商品情報入力</h1>
+</td></tr></table>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<!--
+/TITLE BAR
+-->
+
+<!--
+SITE PATH
+-->
+<div id="modCtgPath">
+<p><a href="http://auctions.yahoo.co.jp/"><strong>オークション</strong></a> &gt; <strong>出品：商品情報入力</strong></p>
+</div>
+<!--
+/SITE PATH
+-->
+
+
+
+
+<!--
+DRAFT
+-->
+<!--
+/DRAFT
+-->
+
+<!--
+INFORMATIONBOX
+-->
+<div id="modInfoBox" class="decTop">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<div class="decBg05">
+<div class="decBg06">
+<div class="decBg07">
+<strong><font color=red>2019年9月30日以降の出品に最低落札価格は設定できません。</font></strong>最低落札価格を設定した商品データで出品・再出品を行う場合も設定は無効となります。必要に応じて開始価格を変更してください。
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!--
+CATEGORY
+-->
+<div id="modCfmBox">
+<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>
+<td><p><strong>以下のカテゴリに出品します。</strong></p><p><span>オークション&nbsp;&gt;&nbsp;自動車、オートバイ&nbsp;&gt;&nbsp;オートバイ&nbsp;&gt;&nbsp;パーツ&nbsp;&gt;&nbsp;タンク&nbsp;&gt;&nbsp;カワサキ用</span></p></td>
+<td width="1%"><p><input id="acMdCateChange" value="カテゴリ変更" type="button" disabled></p></td>
+</tr></table>
+</div>
+<!--
+/CATEGORY
+-->
+
+
+<!--
+ERRORS BOX
+-->
+<!--
+/ERRORS BOX
+-->
+
+
+<!--
+TOOL TIPS
+-->
+<!--
+/TOOL TIPS
+-->
+
+<form method="post" id="auction" name="auction" action="https://auctions.yahoo.co.jp/pageinfo9/jp/show/preview">
+	
+<input type="hidden" name="aID" value="k440307089">
+<input type="hidden" name="oldAID" value="">
+<input type="hidden" name="mode" value="oresubmit">
+<input type="hidden" name="StartPriceOld" value="15800.000000">
+<input type="hidden" name="category" value="2084016521">
+<input type="hidden" name="denomination" value="YEN">
+<input type="hidden" name="cc" value="jp">
+<input type="hidden" name="md5" value="hQic_noLpkKdTTxlag1G5b3k8.NgnRNpjA--">
+<input type="hidden" name="imgtoken" value="uqG3bEix12n63tDoeMiYw/9xe1L7H/ek6VtTIMuYU94=">
+<input type="hidden" name="loginChk" value="">
+<input type="hidden" name=".crumb" value="">
+<input id="auc_tos" type="hidden" name="tos" value="yes">
+<input type="hidden" name="type" value="">
+<input type="hidden" name="thumbnailwidth" value="">
+<input type="hidden" name="thumbnailid" value="">
+<input type="hidden" name="thumbNail" value="">
+<input type="hidden" name="ImageServer" value="186">
+<input type="hidden" id="auc_image1" name="Image1" value="600x450-1580720595jxbkjb151208.jpg">
+<input type="hidden" name="ImageViewServer1" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth1" value="600">
+<input type="hidden" name="ImageHeight1" value="450">
+<input type="hidden" id="auc_image_uploaded1" name="Image1Uploaded" value="1">
+<input type="hidden" id="auc_image_fullpath1" name="ImageFullPath1" value="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595jxbkjb151208.jpg">
+<input type="hidden" id="auc_image2" name="Image2" value="600x450-1580720595rkzvzv151208.jpg">
+<input type="hidden" name="ImageViewServer2" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth2" value="600">
+<input type="hidden" name="ImageHeight2" value="450">
+<input type="hidden" id="auc_image_uploaded2" name="Image2Uploaded" value="1">
+<input type="hidden" id="auc_image_fullpath2" name="ImageFullPath2" value="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595rkzvzv151208.jpg">
+<input type="hidden" id="auc_image3" name="Image3" value="600x450-1580720595afvcqp151208.jpg">
+<input type="hidden" name="ImageViewServer3" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth3" value="600">
+<input type="hidden" name="ImageHeight3" value="450">
+<input type="hidden" id="auc_image_uploaded3" name="Image3Uploaded" value="1">
+<input type="hidden" id="auc_image_fullpath3" name="ImageFullPath3" value="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595afvcqp151208.jpg">
+<input type="hidden" id="auc_image4" name="Image4" value="600x450-1580720595gl2nh9151208.jpg">
+<input type="hidden" name="ImageViewServer4" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth4" value="600">
+<input type="hidden" name="ImageHeight4" value="450">
+<input type="hidden" id="auc_image_uploaded4" name="Image4Uploaded" value="1">
+<input type="hidden" id="auc_image_fullpath4" name="ImageFullPath4" value="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595gl2nh9151208.jpg">
+<input type="hidden" id="auc_image5" name="Image5" value="600x450-1580720595hdve8s151208.jpg">
+<input type="hidden" name="ImageViewServer5" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth5" value="600">
+<input type="hidden" name="ImageHeight5" value="450">
+<input type="hidden" id="auc_image_uploaded5" name="Image5Uploaded" value="1">
+<input type="hidden" id="auc_image_fullpath5" name="ImageFullPath5" value="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595hdve8s151208.jpg">
+<input type="hidden" id="auc_image6" name="Image6" value="600x450-1580720595gstazm151208.jpg">
+<input type="hidden" name="ImageViewServer6" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth6" value="600">
+<input type="hidden" name="ImageHeight6" value="450">
+<input type="hidden" id="auc_image_uploaded6" name="Image6Uploaded" value="1">
+<input type="hidden" id="auc_image_fullpath6" name="ImageFullPath6" value="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595gstazm151208.jpg">
+<input type="hidden" id="auc_image7" name="Image7" value="">
+<input type="hidden" name="ImageViewServer7" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth7" value="0">
+<input type="hidden" name="ImageHeight7" value="0">
+<input type="hidden" id="auc_image_uploaded7" name="Image7Uploaded" value="">
+<input type="hidden" id="auc_image_fullpath7" name="ImageFullPath7" value="">
+<input type="hidden" id="auc_image8" name="Image8" value="">
+<input type="hidden" name="ImageViewServer8" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth8" value="0">
+<input type="hidden" name="ImageHeight8" value="0">
+<input type="hidden" id="auc_image_uploaded8" name="Image8Uploaded" value="">
+<input type="hidden" id="auc_image_fullpath8" name="ImageFullPath8" value="">
+<input type="hidden" id="auc_image9" name="Image9" value="">
+<input type="hidden" name="ImageViewServer9" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth9" value="0">
+<input type="hidden" name="ImageHeight9" value="0">
+<input type="hidden" id="auc_image_uploaded9" name="Image9Uploaded" value="">
+<input type="hidden" id="auc_image_fullpath9" name="ImageFullPath9" value="">
+<input type="hidden" id="auc_image10" name="Image10" value="">
+<input type="hidden" name="ImageViewServer10" value="img317.auctions.yahoo.co.jp">
+<input type="hidden" name="ImageWidth10" value="0">
+<input type="hidden" name="ImageHeight10" value="0">
+<input type="hidden" id="auc_image_uploaded10" name="Image10Uploaded" value="">
+<input type="hidden" id="auc_image_fullpath10" name="ImageFullPath10" value="">
+<input type="hidden" name="auction_server" value="auctions.yahoo.co.jp/pageinfo9/jp">
+<input type="hidden" name="uploadserver" value="sell.auctions.yahoo.co.jp">
+<input type="hidden" name="ypoint" value="0">
+<input type="hidden" name="type" value="">
+
+<!--
+FORM NECESSARY
+-->
+<div id="modFormReqrd">
+<div class="untHead">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<h2>
+<span name="must_form">必須項目</span>
+<a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/40782" target="new"><img src="https://s.yimg.jp/images/common/helpicon.gif" alt="必須項目のヘルプ" width="13" height="15" border="0" class="decImg01"></a>
+<div class="clr"></div>
+</h2>
+</div>
+</div>
+</div>
+</div>
+</div>
+<fieldset>
+<div class="untBody">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<th width="166" class="decFormLabelReqrd">タイトル<strong>【必須】</strong></th>
+<td id="tips_title">
+<div class="decFormTxtBox">
+<table border="0" width="100%" cell-padding="0" cell-spacing="0"><tr>
+<td style="padding-right:20px;"><input type="text" id="auc_title" name="Title" maxlength="130" vaLue="★【S】良品♪GPz1100(空冷) 純正フューエルポンプ♪実働車取外♪" style="width:100%;"></td>
+<td style="width:8em;"><span>（残り</span><span id="auc_title_length">65</span><span>文字）</span></td>
+</tr></table>
+</div>
+</td>
+</tr>
+<tr>
+<th width="166" class="decFormLabelReqrd">
+説明<strong>【必須】</strong></th>
+<td id="tips_description">
+
+<div id="descriptionArea">
+
+
+
+
+<input type="hidden" name="submit_description" id="submit_description" value="text">
+<textarea name="Description" id="Description" style="visibility:hidden;height:1px;"><CENTER>
+<FONT SIZE=2>※０６ＭＭ４２※</FONT><BR>
+<BR>
+
+
+
+
+
+<TABLE WIDTH=750 CELLSPACING=0 CELLPADDING=2>
+<TR BGCOLOR=#ffffff>
+<TD BGCOLOR=#ffbb00 ALIGN=center WIDTH=100%>
+<FONT SIZE=4 COLOR=#000000><B>【　車体画像　】</B></FONT>
+</TD>
+</TR>
+<TR>
+<TD COLSPAN=9 BGCOLOR=#ffbb00 ALIGN=center>
+<TABLE BGCOLOR=#ffffff WIDTH=100% CELLPADDING=9>
+<TD>
+
+<IMG SRC=http://www.mukeidou.com/yahoo/syatai/06mm.jpg><BR>
+</CENTER>
+</TD></TABLE></TD></TR></TABLE>
+<BR>
+
+
+
+
+<TABLE WIDTH=750 BORDER=0 CELLSPACING=0 CELLPADDING=0><TR><TD><IMG SRC=http://www.mukeidou.com/yahoo/design/setsumei/head.gif></TD></TR><TR><TD ALIGN=center BGCOLOR=#f7ab2e><TABLE WIDTH=700 BORDER=1 CELLSPACING=0 CELLPADDING=13>
+
+<TR><TD WIDTH=110 ALIGN=center VALIGN=middle BGCOLOR=#ebebeb><B>商品説明</B></TD><TD WIDTH=532 ALIGN=left BGCOLOR=#FFFFFF>
+
+<B>【商品データ】</B><BR>
+
+取外車両車体番号：ZXT10A-016***<BR>
+
+
+
+<HR>
+<B>商品の状態は商品画像にてご確認ください。<BR>
+（追加画像が掲載されている場合は、そちらも必ずご確認ください。）</B>
+<BR>
+<HR>
+
+
+他にも<FONT SIZE=4><B><A HREF=http://sellinglist.auctions.yahoo.co.jp/user/mukeidou?p=GPz1100F&amp;auccat=&amp;aq=-1&amp;oq=&amp;ei=UTF-8&amp;slider=0&amp;u=mukeidou TARGET=new>GPz1100F</A></B></FONT>の部品を多数出品しております。<BR>
+
+
+
+<TR><TD ALIGN=center VALIGN=middle BGCOLOR=#ebebeb><B>発送方法</B></TD>
+<TD ALIGN=left BGCOLOR=#FFFFFF>
+<B>【宅配便 元払い】</B><BR>
+　弊社指定の運送業者にて発送いたします。<BR>
+<BR>
+<FONT SIZE=4>●商品タイトルの【　】・『　』内の記号は<FONT COLOR=red>送料区分</FONT>になります。<BR></FONT>
+お届け先までの送料については、下表にてご確認ください。<BR>
+<BR>
+<IMG SRC=http://www.mukeidou.com/yahoo/design/setsumei/sendingcost.png><BR>
+<BR>
+※北海道/沖縄/離島/一部山間地域については別途中継料が必要となる場合がありますので、<A HREF=mailto:info@mukeidou.com TARGET=new>info@mukeidou.com</A> までお問い合わせください。<BR>
+<HR>
+We also support international shipping. Please see below for more information.<BR>
+</TD></TR>
+
+
+
+
+<TR><TD ALIGN=center VALIGN=middle BGCOLOR=#ebebeb><B>お支払方法</B></TD>
+<TD ALIGN=left BGCOLOR=#FFFFFF>
+当店はオークションストアとなりますので、<B>消費税</B>を別途いただいております。<BR>
+<BR>
+<B>・[Yahooかんたん決済]</B><BR>
+<B>・[銀行振込（楽天銀行）]</B><BR>
+<B>・[郵便振替（ゆうちょ銀行）]</B><BR>
+<BR>
+<B>・[オークション分割払い]</B><BR>
+お支払い合計金額が30,000円以上の場合にご選択いただけます。<BR>
+詳細は <A HREF=mailto:info@mukeidou.com TARGET=new><FONT COLOR=#C8000A>info@mukeidou.com</FONT></A> までお問い合わせください。<BR>
+もし審査が通らない場合は、お振込みでお支払いいただくか、キャンセルということで落札価格の7%(税抜)をキャンセル料としていただきます。<BR>
+出品金額にてお取引の意思がある方は事前審査も可能ですので、ご希望の場合は質問やメール等でご連絡ください。<BR>
+
+<BR>
+上記のいずれかでお願いいたします。<BR>
+
+</TD></TR>
+
+
+<TR><TD ALIGN=center VALIGN=middle BGCOLOR=#ebebeb><B>その他</B></TD>
+<TD ALIGN=left BGCOLOR=#FFFFFF>
+商品画像と商品の状態が著しく異なる場合、<FONT SIZE=4><B>ご落札日を起算日として<BR>
+14日以内</B></FONT>であれば返品・交換
+<FONT COLOR=red><B>対応させていただきます。</B></FONT><BR><BR>
+
+<B>※ご連絡はやりとりの経緯を記録するため、メールもしくは取引メッセージにてお願いいたします。<FONT COLOR=red>お電話でのご連絡には対応いたしません。</FONT><BR></B>
+<BR>
+<B>また、お取引に関する重要事項などが記載しておりますので、ご入札前には必ず<A HREF=http://store.auctions.yahoo.co.jp/html/profile/mukeidou.html TARGET=new><FONT COLOR=#C8000A SIZE=4>◆ストア情報欄◆</FONT></A> をご覧ください。</B><BR>
+<BR>
+
+
+
+
+<BR><B>
+商品については画像をよく見てご判断ください。<BR>
+取付部品や付属品等も含め、画像のものがすべてとなります。<BR></B>
+<BR>
+・商品ページの一部は携帯・アプリから確認できない場合がありますので、必ずPCブラウザもしくはPCからご確認ください。<BR>
+・使用されているモニター等の違いにより、多少色合いが異なって見える場合があります。<BR>
+・画像を見てわからない部分、取り付け等に関して不安な部分等ありましたら、ご入札前に必ずご質問ください。<BR>
+・商品に使用されている消耗部品(パッキン類・ベアリング・タイヤ等)については、交換が必要になる場合があります。<BR>
+・動作品については不具合の有無を記載しておりますが、あくまで中古品相当としてお考えください。<BR>
+<BR>
+直接のご質問は、商品名を明記の上、 <A HREF=mailto:info@mukeidou.com TARGET=new><FONT COLOR=#C8000A>info@mukeidou.com</FONT></A> までお願いいたします。<BR>
+（PCメールからの受信が可能、もしくは受信が可能なように設定済のメールアドレスよりご送信ください。）<BR>
+
+<BR>
+<B>以上の内容をよくご理解の上、ご入札よろしくお願いいたします。<BR>
+（読まれていない方、ご理解いただけない方のご入札はお断りいたします。）</B>
+<BR>
+<BR>
+ご落札後に自動で送信されるYahooからの落札通知メールにお取引の詳細等が記載されておりますので、こちらもご一読ください。<BR>
+（落札通知メールが届かず確認ができない場合は、メールもしくは取引メッセージにてご連絡ください。）<BR>
+
+
+</TD>
+</TR>
+
+<TR><TD ALIGN=center VALIGN=middle BGCOLOR=#ebebeb><B>International shipping</B></TD>
+<TD ALIGN=left BGCOLOR=#FFFFFF>
+We also support international shipping by EMS as much as possible.<BR>
+(May not be supported by reasons such as community size and weight, shipping destination.)<BR>
+Payment method is only compatible with international money transfer to the bank.<BR>
+If you have any questions such as shipping and details of the product, please email <A HREF=mailto:info@mukeidou.com TARGET=new><FONT COLOR=#C8000A>info@mukeidou.com</FONT></A> by mention of the URL or auction ID.<BR>
+In addition, please write &amp;quot;questions about Yahoo auction&amp;quot; The title of the e-mail.<BR>
+</TD>
+</TR>
+
+</TABLE></TD></TR>
+
+<TR>
+<TD><IMG SRC=http://www.mukeidou.com/yahoo/design/setsumei/nagare.gif></TD></TR>
+<TR><TD BGCOLOR=#F7AB2E><FONT SIZE=2>　　※</FONT><A HREF=http://help.yahoo.co.jp/help/jp/auct/win/win-29.html TARGET=new><FONT COLOR=#000 SIZE=2>オーダーフォーム</FONT></A><FONT SIZE=2>へのリンクはご落札後、商品ページに表示されます。<BR>
+　　※入力画面の説明欄をよくご確認ください。</FONT></TD></TR>
+
+<TR><TD><IMG SRC=http://www.mukeidou.com/yahoo/design/setsumei/sokujitsufoot.gif></TD></TR>
+
+<TR><TD ALIGN=center><A HREF=http://sellinglist.auctions.yahoo.co.jp/user/mukeidou?u=mukeidou TARGET=new><IMG SRC=http://www.mukeidou.com/yahoo/design/middle/all_btn.gif BORDER=0></A></TD></TR></TABLE>
+<BR><BR>
+
+</textarea>
+<input type="hidden" name="UEDescription" id="UEDescription" value="">
+<input type="hidden" name="Description_rte" id="Description_rte" value="">
+<input type="hidden" name="Description_rte_work" id="Description_rte_work" value="">
+
+<script type="text/javascript">
+	function ModeTabTEXTON(value) {
+		if (value==true) {
+			document.getElementById("textMode").style.display="none";
+			document.getElementById("htmlMode").style.display="block";
+			document.forms["auction"].elements["submit_description"].value = "html";
+			if (!isDesignMode) {
+				isDesignMode = true;
+				if (YAHOO.env.ua.ie || YAHOO.env.ua.gecko || YAHOO.env.ua.chrome || (YAHOO.env.ua.webkit && !YAHOO.env.ua.android)) {
+					setFrameDesignMode(0);
+				}
+			}
+		} else {
+			document.getElementById("textMode").style.display="block";
+			document.getElementById("htmlMode").style.display="none";
+			document.forms["auction"].elements["submit_description"].value = "text";
+		}
+	}
+
+	function submitDescription() {
+		if (YAHOO.env.ua.ie || YAHOO.env.ua.gecko || YAHOO.env.ua.chrome || (YAHOO.env.ua.webkit && !YAHOO.env.ua.android)) {
+			document.forms["auction"].elements["Description_plain"].value = "";
+			document.forms["auction"].elements["Description_rte"].value = "";
+			if (document.forms["auction"].elements["submit_description"].value == "text") {
+				document.forms["auction"].elements["Description"].value = document.forms["auction"].elements["Description_plain_work"].value;
+				document.forms["auction"].elements["Description_plain"].value = document.forms["auction"].elements["Description_plain_work"].value.replace(/%/g,"%25").replace(/"/g,"%22").replace(/'/g,"%27").replace(/&/g, "%26");
+			} else {
+				document.forms["auction"].elements["Description"].value = editor.GetHTML().replace(/<br>$/i, "");
+				document.forms["auction"].elements["Description_rte"].value = editor.GetHTML().replace(/<br>$/i, "").replace(/%/g,"%25").replace(/"/g,"%22").replace(/'/g,"%27").replace(/&/g, "%26");
+			}
+		} else {
+			document.forms["auction"].elements["Description"].value = document.forms["auction"].elements["Description_plain_work"].value;
+			document.forms["auction"].elements["Description_plain"].value = document.forms["auction"].elements["Description_plain_work"].value.replace(/%/g,"%25").replace(/"/g,"%22").replace(/'/g,"%27").replace(/&/g, "%26");
+		}
+
+		if (document.forms["auction"].elements["UEDescription_plain"]) {
+			document.forms["auction"].elements["UEDescription_plain"].value = "";
+		}
+		if (document.forms["auction"].elements["UEDescription_rte"]) {
+			document.forms["auction"].elements["UEDescription_rte"].value = "";
+		}
+		if (document.forms["auction"].elements["UEDescription"]) {
+			document.forms["auction"].elements["UEDescription"].value = "";
+		}
+		if (document.forms["auction"].elements["UEcar_Description"]) {
+			document.forms["auction"].elements["UEcar_Description"].value = "";
+		}
+		if (document.forms["auction"].elements["UETitle"]) {
+			document.forms["auction"].elements["UETitle"].value = "";
+		}
+		if (document.forms["auction"].elements["Description_rte_work"]) {
+			document.forms["auction"].elements["Description_rte_work"].value = "";
+		}
+		if (document.forms["auction"].elements["Description_plain_work"]) {
+			document.forms["auction"].elements["Description_plain_work"].value = "";
+		}
+	}
+
+	function getBytes(text) {
+		if (!text) {
+			return 0;
+		}
+
+		var count = 0;
+		for (var i = 0; i < text.length; i++) {
+			var c = text.charCodeAt(i);
+			if (c < 256) {
+				count++;
+			} else {
+				count+=2;
+			}
+		}
+		return count;
+	}
+
+	function validateDescription() {
+		var descValue = "";
+		if (YAHOO.env.ua.ie || YAHOO.env.ua.gecko || YAHOO.env.ua.chrome || (YAHOO.env.ua.webkit && !YAHOO.env.ua.android)) {
+			if (document.forms["auction"].elements["submit_description"].value == "text") {
+				descValue = document.forms["auction"].elements["Description_plain_work"].value;
+			} else {
+				descValue = editor.GetHTML().replace(/<br>$/i, "");	
+			}
+		} else {
+			descValue = document.forms["auction"].elements["Description_plain_work"].value;
+		}
+
+		var maxByteNum = 51000;
+
+		if (descValue) {
+			var byteNum = getBytes(descValue);
+			if (byteNum >= maxByteNum) {
+				return false;
+			}
+		}
+		return true;
+	}
+</script>
+
+
+<div id="htmlMode" style="display:block;">
+<div class="decFormTab">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td class="decFormTab01On"><p>通常入力</p></td>
+<td class="decTabSp">&nbsp;</td>
+<td class="decFormTab01Off"><p><A id="aucHTMLtag" href="javascript:void(0);" onclick="ModeTabTEXTON(false);">HTMLタグ入力</A></p></td>
+<td>&nbsp;</td></tr></table>
+</div>
+
+<div class="decFormTxtArea">
+<script type="text/javascript">
+	if (YAHOO.env.ua.ie || YAHOO.env.ua.gecko || YAHOO.env.ua.chrome || (YAHOO.env.ua.webkit && !YAHOO.env.ua.android)) {
+		var formName = "auction";
+		var controlName = "Description_rte";
+		var documentFragmentRTE = "<div id=\"RTEContainer\" style=\"left: 0px; position: relative; top: 0px; height: auto; width: 100%;\">\n";
+		var idGenerator = null;
+		var editor = true;
+		var isDesignMode = false
+
+		document.write(documentFragmentRTE);
+		idGenerator = new RTEIDGenerator(0);
+		editor = new RTEEditor(idGenerator);
+
+		editor.SetLocation("jp");
+		editor.SetIconVersion("1");
+		editor.Instantiate();
+		document.write('</div>');
+	} else {
+		var documentFragmentTextarea = "<div style=\"font-size: 90%; margin: 4px 0;\">お使いのブラウザでは「通常入力」機能をご利用いただけません。<\/div>\n";
+		document.write(documentFragmentTextarea);
+	}
+</script>
+</div>
+</div>
+
+<div id="textMode" style="display:none;">
+<div class="decFormTab">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td class="decFormTab01Off"><p><A href="javascript:void(0);" onclick="ModeTabTEXTON(true);">通常入力</A></p></td>
+<td class="decTabSp">&nbsp;</td>
+<td class="decFormTab01On"><p>HTMLタグ入力</p></td>
+<td>&nbsp;</td>
+</tr></table>
+</div>
+<div class="decFormTxtArea">
+<textarea name="Description_plain_work" cols="60" rows="10"></textarea>
+<textarea name="Description_plain" style="visibility:hidden;height:1px;"></textarea>
+<p class="decTx03"><a href="https://rdsig.yahoo.co.jp/auction/aucfun/RV=1/RE=1585719846/RH=cmRzaWcueWFob28uY28uanA-/RB=/RU=aHR0cDovL2F1Y2Zhbi5jb20vYXVjdGVtcC8-/RS=^ADAfslNctU6Y9l.N..SgA7RXtpm780-" target="new">かんたん、きれいに入力できるテンプレートを使う</a>（外部リンク）</p>
+</div>
+</div>
+
+<script type="text/javascript">
+
+	document.forms["auction"].elements["Description_plain_work"].value = document.forms["auction"].elements["Description"].value.replace(/%26/g, "&").replace(/%27/g,"'").replace(/%22/g,'"').replace(/%25/g,"%");
+
+YuE.onAvailable("descriptionArea", initDescription);
+	function initDescription(){
+		if (YAHOO.env.ua.ie || YAHOO.env.ua.gecko || YAHOO.env.ua.chrome || (YAHOO.env.ua.webkit && !YAHOO.env.ua.android)) {
+			if (document.forms["auction"].elements["submit_description"].value == "html") {
+				if (document.forms["auction"].elements["Description"].value) {
+					editor.SetHTML(document.forms["auction"].elements["Description"].value);
+				}
+			} else if (document.forms["auction"].elements["submit_description"].value == "text") {
+				if (document.forms["auction"].elements["Description"].value) {
+					document.forms["auction"].elements["Description_plain_work"].value = document.forms["auction"].elements["Description"].value;
+				}
+				ModeTabTEXTON(false);
+			}
+			setupRTE(document.auction);
+		} else {
+			if (!document.forms["auction"].elements["Description_plain_work"].value) {
+				document.forms["auction"].elements["Description_plain_work"].value = document.forms["auction"].elements["Description"].value;
+			}
+		}
+	}
+
+
+	if (document.forms["auction"].elements["submit_description"].value == "") {
+		document.forms["auction"].elements["submit_description"].value = "html";
+	}
+	ModeTabTEXTON(false);
+</script>
+</div>
+
+
+</td>
+</tr>
+
+<tr>
+<th width="166" class="decFormLabelReqrd">販売形式<strong>【必須】</strong></th>
+<td id="tips_salesmode">
+<div class="decFormRadio">
+<ul>
+<li>
+<input id="salesmode_auction" type="radio" name="salesmode" value="auction" checked>
+<label for="salesmode_auction">オークション形式で出品</label>
+</li>
+<li>
+<input id="salesmode_buynow" type="radio" name="salesmode" value="buynow" checked>
+<label for="salesmode_buynow">定額で出品</label>
+</li>
+<li>
+<input id="salesmode_offer" type="radio" name="salesmode" value="offer" >
+<label for="salesmode_offer">定額で出品（値下げ交渉あり）</label>（<a href="https://auctions.yahoo.co.jp/special/html/offer/guide/" target="new" class="decLnk01">詳細</a>）
+</li>
+</ul>
+</div>
+</td>
+</tr>
+
+<tr>
+<th width="166" class="decFormLabelReqrd">
+価格設定<strong>【必須】</strong></th>
+<td id="tips_pricemode">
+<div class="decFormTxtBox">
+<div id="pricemode_auction">
+開始価格：
+<input id="auc_StartPrice" name="StartPrice" type="text" SIZE="10" maxlength="10" value="15,800" onChange="toHankaku(this)">
+円
+<div class="decTx13">今出品されている商品や過去に落札された商品の価格を参考にしてください<span class="decSrch"><strong><a href="javascript:void(0);" id="search_link" onClick="return false;">参考価格を検索</a></strong></span></div>
+<div class="decTx14"><strong>【任意】</strong></div>
+</div>
+即決価格：
+<input id="auc_BidOrBuyPrice" name="BidOrBuyPrice" type="text" size="10" maxlength="10" value="15,800" onChange="toHankaku(this)">
+円
+<div id="start_campaign">
+</div>
+<div class="decTx15">入札者がこの価格以上で入札すると、終了時間前でも自動的に落札されます</div>
+<div id="item_search">
+<div class="decTx13">今出品されている商品や過去に落札された商品の価格を参考にしてください<span class="decSrch"><strong><a href="javascript:void(0);" id="search_link2" onClick="return false;">参考価格を検索</a></strong></span></div>
+</div>
+<div id="error_auction">
+</div>
+<div id="error_price">
+</div>
+<div id="error_offer">
+</div>
+</div>
+<input type="hidden" id="auc_Offer" name="Offer" value="">
+</td>
+</tr>
+
+<tr>
+<th width="166" class="decFormLabelReqrd">
+個数<strong>【必須】</strong></th>
+<td>
+<div class="decFormTxtBox">
+<input id="auc_Quantity" type="text" name="Quantity" size="3" maxlength="3" value="1" onChange="toHankaku(this)">個<span class="decTx01">（1個～99個）</span>
+<span class="decTx01"><strong>
+オークションストアは無料
+<BR>複数個の商品を1セットとして売る場合、個数は「1」とします。
+</strong></span>
+</div>
+<div class="decFormSelect">
+<ul>
+<li>
+<input type="checkbox" name="hasBidLimitQuantity" value="1"> お一人様
+<select name="BidLimitQuantity">
+<option value="1">1
+<option value="2">2
+<option value="3">3
+<option value="4">4
+<option value="5">5
+</select>
+個まで　（入札個数制限を設定）
+</li>
+</ul>
+</div>
+</td>
+</tr>
+<tr>
+<th width="166" class="decFormLabelReqrd">
+開催期間<strong>【必須】</strong></th>
+<td>
+<div class="decFormSelect">
+<script type="text/javascript">
+<!--
+	var dayinfo = new Date(parseInt("1584510246") * 1000);
+	mm = dayinfo.getMonth() + 1;
+	dd = dayinfo.getDate();
+	dw = new Array("日" ,"月" ,"火" ,"水" ,"木" ,"金" ,"土");
+	document.write("開始日：" + mm + "月" + dd + "日" + "(" + dw[dayinfo.getDay()] + ")～終了日：");
+-->
+</script>
+<select name="ClosingDate" id="ClosingDate"></select>
+<span><a href="javascript:void(0);" id="calender_opn"><img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/ic_019.gif" alt="カレンダー" width="16" height="16" border="0"></a></span>
+終了時間：
+<select name="ClosingTime" id="ClosingTime"></select>
+<input type="hidden" name="submitUnixtime" value="1584510246">
+<input type="hidden" name="Duration" id="Duration" value="">
+<input type="hidden" name="tmpClosingDate" id="tmpClosingDate" value="">
+<input type="hidden" name="tmpClosingTime" id="tmpClosingTime" value="">
+<strong>期間：</strong><strong id="auc_duration_days1" name="auc_duration_days1"></strong><strong>日</strong>
+</div>
+</td>
+</tr>
+<tr>
+<th width="166" class="decFormLabelReqrd">
+商品発送元の地域<br>
+<strong>【必須】</strong></th>
+<td>
+<span class="decFormSelect">
+<select id="auc_loc_cd" name="loc_cd">
+<option value="">都道府県を選択
+<OPTION VALUE="1">北海道
+<OPTION VALUE="2">青森県
+<OPTION VALUE="3">岩手県
+<OPTION VALUE="4">宮城県
+<OPTION VALUE="5">秋田県
+<OPTION VALUE="6">山形県
+<OPTION VALUE="7">福島県
+<OPTION VALUE="8">茨城県
+<OPTION VALUE="9">栃木県
+<OPTION VALUE="10">群馬県
+<OPTION VALUE="11">埼玉県
+<OPTION VALUE="12">千葉県
+<OPTION VALUE="13">東京都
+<OPTION VALUE="14">神奈川県
+<OPTION VALUE="15">山梨県
+<OPTION VALUE="16">長野県
+<OPTION VALUE="17">新潟県
+<OPTION VALUE="18">富山県
+<OPTION VALUE="19">石川県
+<OPTION VALUE="20">福井県
+<OPTION VALUE="21">岐阜県
+<OPTION VALUE="22">静岡県
+<OPTION VALUE="23">愛知県
+<OPTION VALUE="24">三重県
+<OPTION VALUE="25">滋賀県
+<OPTION VALUE="26">京都府
+<OPTION VALUE="27">大阪府
+<OPTION VALUE="28">兵庫県
+<OPTION VALUE="29">奈良県
+<OPTION VALUE="30">和歌山県
+<OPTION VALUE="31">鳥取県
+<OPTION VALUE="32">島根県
+<OPTION VALUE="33">岡山県
+<OPTION VALUE="34">広島県
+<OPTION VALUE="35">山口県
+<OPTION VALUE="36">徳島県
+<OPTION VALUE="37">香川県
+<OPTION VALUE="38" SELECTED>愛媛県
+<OPTION VALUE="39">高知県
+<OPTION VALUE="40">福岡県
+<OPTION VALUE="41">佐賀県
+<OPTION VALUE="42">長崎県
+<OPTION VALUE="43">熊本県
+<OPTION VALUE="44">大分県
+<OPTION VALUE="45">宮崎県
+<OPTION VALUE="46">鹿児島県
+<OPTION VALUE="47">沖縄県
+<OPTION VALUE="48">海外
+</select>
+</span>
+<span class="decFormTxtBox">
+市区町村（任意）：
+<input id="acMdSendMunicipality" type="text" size="20" maxlength="20" name="city" value="">
+</span>
+</td>
+</tr>
+
+
+<tr>
+<th width="166" class="decFormLabelReqrd">
+送料負担</th>
+<td id="tips_shipping">
+<div class="decFormRadio">
+<ul>
+<li><input id="auc_shipping_buyer" type="hidden" name="shipping" value="buyer"><label for="auc_shipping_buyer">落札者</label></li>
+</ul>
+</div>
+</td>
+</tr>
+
+<tr>
+<th width="166" class="decFormLabelReqrd">
+代金先払い、後払い<br>
+<strong>【必須】</strong></th>
+<td id="tips_shiptime">
+<div class="decFormRadio">
+<ul>
+<li><input id="auc_shiptime_payment" type="radio" name="shiptime" value="payment" checked><label for="auc_shiptime_payment">代金先払い（支払い確認後商品を発送）</label></li>
+<li><input id="auc_shiptime_close" type="radio" name="shiptime" value="close" ><label for="auc_shiptime_close">代金後払い（落札後、支払いの確認をまたずに商品を発送）</label></li>
+</ul>
+</div>
+</td>
+</tr>
+
+<!--
+Payment
+-->
+<tr>
+<th width="166" class="decFormLabelReqrd">
+決済方法<strong>【必須】</strong></th>
+<td id="tips_payment">
+<div class="decFormHead">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<p><span>【必須】</span>決済方法を選択してください（複数選択可）</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="decListSmry">
+<ul>
+<input type="hidden" name="doStorePayment" value="1">
+
+
+<li><input id="ypmOK" type="checkbox" disabled checked><label for="ypmOK">Yahoo!かんたん決済</label>
+<input type="hidden" name="ypmOKChecked" value="yes">
+（<a href="https://payment.yahoo.co.jp/guide/seller.html" target="new">詳細</a>）
+</li>
+<input type="hidden" name="ypmOK" value="1">
+
+<input type="hidden" name="aspj1" value="1">
+
+<li>
+<input type="checkbox" id="abkn1" name="abkn1Checked" value="yes" checked  >
+<label for="abkn1">楽天銀行（旧イーバンク銀行）</label>
+<input type="hidden" name="abkn1" value="楽天銀行（旧イーバンク銀行）">
+</li>
+
+</ul>
+
+<ul>
+
+<li><input id="aspt" type="checkbox" name="asptChecked" value="yes" checked><label for="aspt">ゆうちょ銀行（振替サービス）</label></li>
+<input type="hidden" name="aspt" value="yes">
+
+
+<li><input id="aspj4" type="checkbox" name="aspj4Checked" value="yes" ><label for="aspj4">商品代引</label></li>
+<input type="hidden" name="aspj4" value="yes">
+
+
+</ul>
+
+
+<ul>
+
+<li>
+<input type="checkbox" id="apm1" name="apm1Checked" value="yes" checked  >
+<label for="apm1">オークション分割払い(30000円～)</label>
+<input type="hidden" name="apm1" value="オークション分割払い(30000円～)">
+</li>
+
+
+
+
+
+</ul>
+</div>
+<div align="right">決済方法の追加、削除は、<a href="https://onavi.auctions.yahoo.co.jp/onavi/show/settletop" target="new">落札ナビ　決済方法設定</a>からおこなってください。</div>
+
+
+</td>
+</tr>
+<!--
+/Payment
+-->
+
+<!-- ブランド -->
+<tr>
+<th width="166" class="decFormLabelReqrd">ブランド</th>
+<td>
+
+</td>
+</tr>
+<!-- /ブランド -->
+<!-- サイズ -->
+<tr>
+<th width="166" class="decFormLabelReqrd">サイズ</th>
+<td>
+</td>
+</tr>
+<!-- /サイズ -->
+
+<tr>
+<th width="166" class="decFormLabelReqrd">商品の状態<strong>【必須】</strong></th>
+<td>
+<div class="decFormRadio">
+<ul>
+<li><input id="istatus_new" type="radio" name="istatus" value="new" > <label for="istatus_new">未使用</label></li>
+<li><input id="istatus_used10" type="radio" name="istatus" value="used10" > <label for="istatus_used10">未使用に近い</label></li>
+<li><input id="istatus_used20" type="radio" name="istatus" value="used20" > <label for="istatus_used20">目立った傷や汚れなし</label></li>
+<li><input id="istatus_used40" type="radio" name="istatus" value="used40" checked> <label for="istatus_used40">やや傷や汚れあり</label></li>
+<li><input id="istatus_used60" type="radio" name="istatus" value="used60" > <label for="istatus_used60">傷や汚れあり</label></li>
+<li><input id="istatus_used80" type="radio" name="istatus" value="used80" > <label for="istatus_used80">全体的に状態が悪い</label></li>
+</ul>
+</div>
+<div class="decFormBtm"></div>
+
+<input id="auc_istatus_comment" type="hidden" name="istatus_comment" value=""><span id="auc_istatus_comment_length" style="display:none"></span>
+</td>
+</tr>
+<tr>
+<th width="166" class="decFormLabelReqrd">
+返品の可否<strong>【必須】</strong></th>
+<td id="tips_retpolicy">
+<div class="decFormRadio">
+<ul>
+<li><input id="retpolicy_no" type="radio" name="retpolicy" value="0" checked><label for="retpolicy_no">返品不可</label></li>
+<li><input id="retpolicy_yes" type="radio" name="retpolicy" value="1" ><label for="retpolicy_yes">返品可</label></li>
+</ul>
+</div>
+<div class="decFormBtm"></div>
+
+<div id="retpolicy_outtxt" class="decFormHead">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<p>【任意】備考があれば記入してください<span class="decTx01">例) 返品送料は落札者負担とさせていただきます、など</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="retpolicy_outform" class="decFormTxtBox">
+<ul>
+<li><input id="auc_retpolicy_comment" type="text" name="retpolicy_comment" value="" size="60" maxlength="60">
+<span>（残り</span><span id="auc_retpolicy_comment_length">30</span><span>文字）</span></li>
+</ul>
+</div>
+</td>
+</tr>
+
+
+<tr>
+<th width="166" class="decFormLabelReqrd">
+JANコード・ISBNコード<br>
+<strong>【任意】</strong></th>
+<td>
+<span class="decFormTxtBox"><input id="" type="text" size="20" maxlength="13" name="articleNumber" value="">
+</span>
+<div id="modChArtBox" style="position:relative; bottom:-15px;">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<div class="decBg05">
+<div class="decBg06">
+<div class="decBg07">
+<div style="margin-left: 10px; font-size: small; color: #ff6000; padding: 5px;">
+<p style="font-weight:bold;">JANコード・ISBNコードが入力できるようになりました<img SRC="https://s.yimg.jp/images/new2.gif" BORDER="0" WIDTH="28" HEIGHT="11" ALT="[new]"></p><br>
+JANコード・ISBNコードを入力すると商品が探されやすくなります、ぜひご活用ください。<br>
+上記コードは、ガイドラインを厳守の上、メーカーなどが発行した正しい値をご入力ください。<br>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+
+</table>
+</div>
+</fieldset>
+
+<div class="untFoot">
+<div class="pts01">
+<p>以上で必須項目の入力は完了ですが、便利なお取引と落札率アップのために、以下の項目もぜひ入力してください。</p>
+</div>
+<div class="pts02a">
+<div class="pts02c">
+<p><input id="auc_submit1" onClick="return onItemSubmit(this, 'https://auctions.yahoo.co.jp/pageinfo9/jp/show/preview');" value="確認画面へ" type="button"></p>
+
+<div class="clr"></div>
+</div>
+<div class="clr"></div>
+</div>
+
+</div>
+
+</div>
+<!--
+/FORM NECESSARY
+-->
+
+<!--
+FORM IMG
+-->
+<input type="hidden" name="sri" value="1">
+<input type="hidden" name="ImageCntMax" value="10">
+
+<div id="modFormImg">
+<div class="untHead">
+
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<div class="decBg05">
+<div class="decBg06">
+<div class="decBg07">
+<div class="decBg08">
+<h2><a href="javascript:void(0);" id="dispimg" name="image_form"><img id="dispimg_icon" src="https://s.yimg.jp/images/auct/template/ui/auc_mod/ic_011.gif" alt="画像のアップロード" border="0"></a>画像のアップロード<a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/40766" target="new"><img src="https://s.yimg.jp/images/common/helpicon.gif" alt="画像のアップロードのヘルプ" width="13" height="15" border="0" class="decImg01"></a></h2>
+<p><a href="javascript:void(0);" id="dispimg2">項目を折りたたむ</a></p>
+<div class="clr"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<fieldset id="imgblock">
+<div class="untBody" id="auc_img_block">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<th width="165" class="decFormLabelNml">
+画像のアップロード</th>
+<td>
+
+<div class="decFormHead">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<p>画像登録画面で画像をアップロードしてください</p>
+<div class="clr"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<p class="decBg06">
+<input id="acMdBtnImageUp" value="画像登録画面へ" type="button" onClick="submitDescription(); if(checkDescriptionAlert()){ Ya.submit(document.auction, 'https://auctions.yahoo.co.jp/sell/f/imgup/', '', checkSubmitData, 'utf-8'); }">
+</p>
+
+<div class="decFormHead">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td>
+<p>以下の画像がアップロードされました。画像にはコメントを追加できます</p></td>
+<td width="1%" align="right">
+<div class="decTx02">
+<input value="画像の編集" type="button" onClick="submitDescription(); if(checkDescriptionAlert()){ Ya.submit(document.auction, 'https://auctions.yahoo.co.jp/sell/f/imgup/', '', checkSubmitData, 'utf-8'); }">
+</div></td>
+</tr>
+</table>
+<div class="clr"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="pts01Off">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" id="imgchg">
+<tr>
+<th width="20%"><p>画像1
+（メイン）
+<span>（変更、削除できません）</span>
+</p></th>
+<th width="20%"><p>画像2
+<span>（変更、削除できません）</span>
+</p></th>
+<th width="20%"><p>画像3
+<span>（変更、削除できません）</span>
+</p></th>
+<th width="20%"><p>画像4
+<span>（変更、削除できません）</span>
+</p></th>
+<th width="20%"><p>画像5
+<span>（変更、削除できません）</span>
+</p></th>
+</tr>
+
+<tr>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img class="resizeImage" src="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595jxbkjb151208.jpg" alt="画像1"
+width="120" 
+ style="filter:alpha(opacity=50);-moz-opacity: 0.5;opacity: 0.5;"
+>
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment1_length">20</span>文字）：<br>
+<input id="auc_image_comment1" name="image_comment1" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img class="resizeImage" src="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595rkzvzv151208.jpg" alt="画像2"
+width="120" 
+ style="filter:alpha(opacity=50);-moz-opacity: 0.5;opacity: 0.5;"
+>
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment2_length">20</span>文字）：<br>
+<input id="auc_image_comment2" name="image_comment2" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img class="resizeImage" src="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595afvcqp151208.jpg" alt="画像3"
+width="120" 
+ style="filter:alpha(opacity=50);-moz-opacity: 0.5;opacity: 0.5;"
+>
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment3_length">20</span>文字）：<br>
+<input id="auc_image_comment3" name="image_comment3" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img class="resizeImage" src="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595gl2nh9151208.jpg" alt="画像4"
+width="120" 
+ style="filter:alpha(opacity=50);-moz-opacity: 0.5;opacity: 0.5;"
+>
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment4_length">20</span>文字）：<br>
+<input id="auc_image_comment4" name="image_comment4" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img class="resizeImage" src="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595hdve8s151208.jpg" alt="画像5"
+width="120" 
+ style="filter:alpha(opacity=50);-moz-opacity: 0.5;opacity: 0.5;"
+>
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment5_length">20</span>文字）：<br>
+<input id="auc_image_comment5" name="image_comment5" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+
+</tr>
+<tr>
+<th width="20%"><p>画像6
+<span>（変更、削除できません）</span>
+</p></th>
+<th width="20%"><p>画像7
+</p></th>
+<th width="20%"><p>画像8
+</p></th>
+<th width="20%"><p>画像9
+</p></th>
+<th width="20%"><p>画像10
+</p></th>
+</tr>
+
+<tr>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img class="resizeImage" src="https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0102/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1580720595gstazm151208.jpg" alt="画像6"
+width="120" 
+ style="filter:alpha(opacity=50);-moz-opacity: 0.5;opacity: 0.5;"
+>
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment6_length">20</span>文字）：<br>
+<input id="auc_image_comment6" name="image_comment6" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/form_bg_003_s.gif" alt="画像が選択されていません" width="80" height="89">
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment7_length">20</span>文字）：<br>
+<input id="auc_image_comment7" name="image_comment7" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/form_bg_003_s.gif" alt="画像が選択されていません" width="80" height="89">
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment8_length">20</span>文字）：<br>
+<input id="auc_image_comment8" name="image_comment8" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/form_bg_003_s.gif" alt="画像が選択されていません" width="80" height="89">
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment9_length">20</span>文字）：<br>
+<input id="auc_image_comment9" name="image_comment9" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+<td width="20%"><div class="decFormImgSmpl">
+<p>
+<img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/form_bg_003_s.gif" alt="画像が選択されていません" width="80" height="89">
+</p>
+<div class="decFormTxtBox"> 【任意】コメント（残り<span id="auc_image_comment10_length">20</span>文字）：<br>
+<input id="auc_image_comment10" name="image_comment10" type="text" value="" size="42" maxlength="40">
+</div>
+</div>
+</td>
+
+</tr>
+</table>
+</div></td>
+</tr>
+</table>
+</div>
+</fieldset>
+
+</div>
+<!--
+/FORM IMG
+-->
+
+<!--
+FORM OPTION
+-->
+<a name="charity_opt"></a>
+<div id="modFormOpt">
+
+<div class="untHead">
+
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<div class="decBg05">
+<div class="decBg06">
+<div class="decBg07">
+<div class="decBg08">
+<h2><a href="javascript:void(0);" id="dispoption" name="option_form"><img id="dispoption_icon" src="https://s.yimg.jp/images/auct/template/ui/auc_mod/ic_011.gif" alt="オプション設定" border="0"></a>オプション設定<a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/40769" target="new"><img src="https://s.yimg.jp/images/common/helpicon.gif" alt="オプション設定のヘルプ" width="13" height="15" border="0" class="decImg01"></a></h2>
+<p><a href="javascript:void(0);" id="dispoption2">項目を折りたたむ</a></p>
+<div class="clr"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<fieldset id="optionblock">
+<div class="untBody">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="decFormSubHead">
+<tr>
+<td>
+<h3>取引オプション</h3></td>
+</tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="decBg06">
+<tr>
+<th width="166" class="decFormLabelNml">入札者評価制限</th>
+<td>
+<ul>
+<li><input id="auc_minBidRating" type="checkbox" name="minBidRating" VALUE="0" CHECKED><label for="auc_minBidRating">総合評価で制限</label></li>
+</ul>
+<p>評価の合計が-1以下の利用者は入札できなくなります</p>
+<br>
+<ul>
+<li><input id="auc_badRatingRatio" type="checkbox" name="badRatingRatio" VALUE="yes" checked><label for="auc_badRatingRatio">非常に悪い・悪い評価の割合で制限</label></li>
+</ul>
+<p>「非常に悪い・悪い」の評価の割合が多い利用者は入札できなくなります（<a href="https://www.yahoo-help.jp/app/answers/detail/a_id/40666/p/353" target="new">詳細</a>）</p>
+</td>
+</tr>
+
+<tr>
+<th width="166" class="decFormLabelNml">入札者認証制限</th>
+<td>
+<ul>
+<li><input id="bidCreditLimit" type="checkbox" name="bidCreditLimit" VALUE="1" ><label for="bidCreditLimit">入札者認証制限あり</label></li>
+</ul>
+<p>モバイル確認または本人確認などを行っていない利用者は入札できなくなります（<a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/69215" target="new">詳細</a>）</p></td>
+</tr>
+
+
+<tr>
+<th width="166" class="decFormLabelNml">自動延長</th>
+<td id="tips_auto_extension">
+<ul>
+<li><input id="auc_AutoExtension" type="checkbox" name="AutoExtension" value="yes" checked><label for="auc_AutoExtension">自動延長あり</label></li>
+</ul>
+<p>オークション終了までの5分間に入札があった場合、自動的に5分間延長します</p></td>
+</tr>
+<tr>
+<th width="166" class="decFormLabelNml">早期終了</th>
+<td id="tips_close_early">
+<ul>
+<li><input id="auc_CloseEarly" type="checkbox" name="CloseEarly" value="yes" checked><label for="auc_CloseEarly">早期終了あり</label></li>
+</ul>
+<p>設定した終了日時前にオークションを終了させることができます</p></td>
+</tr>
+
+<tr>
+<th width="166" class="decFormLabelNml">自動再出品</th>
+<td id="tips_resubmit">
+<div class="decFormSelect">
+<select name="numResubmit" id="numResubmit">
+<option value="0" >0回</option>
+<option value="1" >1回</option>
+<option value="2" >2回</option>
+<option value="3" selected>3回</option>
+</select>
+<strong>期間：</strong><strong id="auc_duration_days2">5</strong><strong>日</strong>
+</div>
+
+<div class="clr"></div>
+<p class="decTx03">オークションが落札されずに終了した場合、自動的に再出品される回数を設定できます</p>
+
+<a name="markdown_form_top"></a>
+<div id="markdown_form">
+<ul class="decTx05">
+<li><input id="auc_AutoSell" type="checkbox" name="markdown" value="1" ><label for="auc_AutoSell"><strong>自動値下げ</strong></label><img SRC="https://s.yimg.jp/images/new2.gif" BORDER="0" WIDTH="28" HEIGHT="11" ALT="[new]"></li>
+</ul>
+<p class="decTx06">
+自動再出品のたびに価格
+<span id="init_price" name="init_price"></span>
+を
+<select name="markdown_ratio" id="markdown_ratio">
+<option value="1" >1％</option>
+<option value="2" >2％</option>
+<option value="3" >3％</option>
+<option value="4" >4％</option>
+<option value="5" >5％</option>
+<option value="10" >10％</option>
+<option value="15" >15％</option>
+<option value="20" >20％</option>
+<option value="25" >25％</option>
+<option value="30" >30％</option>
+</select>
+下げる
+<br>
+<span id="price_transition"></span>
+</p>
+
+
+
+</div>
+
+</td>
+</tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="decFormSubHead">
+<tr>
+<td>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="decBg01">
+<tr>
+<td class="decBg01"><h3>PRオプション</h3></td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+
+
+<tr>
+<th width="166" class="decFormLabelPay">注目のオークション<br>（有料）</th>
+<td id="tips_featured">
+<div class="decFormTxtBox">
+1日あたり&nbsp;<input id="acMdAttentionAuc" type="text" size="3" maxlength="3" name="featuredAmount" value="" onChange="toHankaku(this)">円
+<span class="decTx01"><strong>1日あたり20円（税込22.00円）～</strong></span>
+<div class="clr"></div>
+</div>
+<div class="clr"></div>
+<p class="decTx03">各カテゴリの商品一覧ページの上部にある、「注目のオークション」欄に商品を表示できます（<a href="https://auctions.yahoo.co.jp/special/html/option/featured/index.html#attention" target="new">詳細</a>）
+</p>
+<p class="decTx03">
+<img SRC="https://s.yimg.jp/images/new2.gif" BORDER="0" WIDTH="28" HEIGHT="11" ALT="[new]"><br>
+「注目のオークション」を設定している商品のうち、設定金額の高さや、<br>
+ 出品者の過去の落札率などを加味した上位3件を検索結果ページの最上部に表示します。
+（<a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/40769#featured" target="new">詳細</a>）
+</p>
+</td>
+</tr>
+
+
+
+
+
+
+<tr>
+<th width="166" class="decFormLabelPay">Tポイント（有料）<div class="decTx04">※落札された場合だけ課金されます</div></th>
+<td id="tips_point">
+<div class="decFormSelect">
+落札価格に対して
+<select name="point">
+<option value="0" selected>--選択--</option>
+<option value="1">1 ％</option>
+<option value="2">2 ％</option>
+<option value="3">3 ％</option>
+<option value="4">4 ％</option>
+<option value="5">5 ％</option>
+<option value="6">6 ％</option>
+<option value="7">7 ％</option>
+<option value="8">8 ％</option>
+<option value="9">9 ％</option>
+<option value="10">10 ％</option>
+<option value="11">11 ％</option>
+<option value="12">12 ％</option>
+<option value="13">13 ％</option>
+<option value="14">14 ％</option>
+<option value="15">15 ％</option>
+<option value="16">16 ％</option>
+<option value="17">17 ％</option>
+<option value="18">18 ％</option>
+<option value="19">19 ％</option>
+<option value="20">20 ％</option>
+</select>でポイント設定します。</div>
+<div class="clr"/>
+<p class="decTxt01">（落札価格に対して1～20％で設定）<p>
+<div class="clr"/>
+<p class="decTxt01"><font color="#FF6000">1ポイントあたり1円のオプション利用料を負担していただきます</font><span><a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/40791"
+target="new"><img src="https://s.yimg.jp/images/common/helpicon.gif" alt="Tポイントのヘルプ" width="13" height="15" border="0"></a></span></p>
+
+</td>
+</tr>
+
+</table>
+<small>※PRオプションの表示はデバイスや表示形式によって異なります。詳しくは<a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/40769" target="new">ヘルプ</a>をご確認ください。</small>
+</div>
+</fieldset>
+</div>
+
+<!--
+/FORM OPTION
+-->
+
+<!--
+FORM DELIVERY
+-->
+
+<div id="modFormDeli">
+<div class="untHead">
+
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<div class="decBg05">
+<div class="decBg06">
+<div class="decBg07">
+<div class="decBg08">
+<h2><a href="javascript:void(0);" id="dispshipping" name="shipping_form"><img id="dispshipping_icon" src="https://s.yimg.jp/images/auct/template/ui/auc_mod/ic_011.gif" alt="商品発送、海外発送の設定" border="0"></a>商品発送、海外発送の設定<a href="https://www.yahoo-help.jp/app/answers/detail/p/353/a_id/40783" target="new"><img src="https://s.yimg.jp/images/common/helpicon.gif" alt="商品発送、海外発送の設定のヘルプ" width="13" height="15" border="0" class="decImg01"></a></h2>
+<p><a href="javascript:void(0);" id="dispshipping2">項目を折りたたむ</a></p>
+<div class="clr"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<fieldset id="shippingblock">
+<div class="untBody">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<th width="166" class="decFormLabelNml">
+送料、配送方法</th>
+<td id="tips_delivery">
+<div class="decFormHead">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<p>入札者が送料を計算できるように、荷物に関する情報を入力してください</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="decFormSelect">
+・縦、横、高さの合計（こん包後）：
+<select id="auc_itemsize" name="itemsize">
+<option value="">--選択--</option>
+<option value="1" >～60cm</option>
+<option value="2" >～70cm</option>
+<option value="3" >～80cm</option>
+<option value="4" >～100cm</option>
+<option value="5" >～120cm</option>
+<option value="6" >～130cm</option>
+<option value="7" >～140cm</option>
+<option value="8" >～160cm</option>
+<option value="9">～170cm</option>
+<option value="10" >170cm～</option>
+</select>
+</div>
+<div class="decFormSelect">
+・重量 （こん包後）：
+<select id="auc_itemweight" name="itemweight">
+<option value="">--選択--</option>
+<option value="1" >～2kg</option>
+<option value="9" >～4kg</option>
+<option value="2" >～5kg</option>
+<option value="10" >～6kg</option>
+<option value="11" >～8kg</option>
+<option value="3" >～10kg</option>
+<option value="12" >～11kg</option>
+<option value="13" >～12kg</option>
+<option value="14" >～14kg</option>
+<option value="4" >～15kg</option>
+<option value="15" >～16kg</option>
+<option value="16" >～18kg</option>
+<option value="5" >～20kg</option>
+<option value="17" >～21kg</option>
+<option value="6" >～25kg</option>
+<option value="7" >～30kg</option>
+<option value="8" >30kg～</option>
+
+</select>
+</div>
+<div class="decBg06"></div>
+
+<div class="decFormHead">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<p>配送方法（運送会社、サービス名など）を記入してください<span class="decTx02">※正式名称ではなくても結構です</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="decFormDeliCorp">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+<tr id="auc_shipname_block1">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname1" type="text" name="shipname1" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname1_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set1" ><span id="auc_rate_sheet1" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set1">全国一律送料設定</span></p>
+<p id="auc_shipping_linked1" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data1" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit1" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete1" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input1" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data1"></span>円（税込み）［<a id="auc_uniform_fee_edit1" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete1" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data1" name="shipfee1" value="">
+<input type="hidden" id="auc_shipname_link_data1" name="shipratelink1" value="">
+</tr>
+<tr id="auc_shipname_block2">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname2" type="text" name="shipname2" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname2_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set2" ><span id="auc_rate_sheet2" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set2">全国一律送料設定</span></p>
+<p id="auc_shipping_linked2" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data2" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit2" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete2" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input2" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data2"></span>円（税込み）［<a id="auc_uniform_fee_edit2" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete2" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data2" name="shipfee2" value="">
+<input type="hidden" id="auc_shipname_link_data2" name="shipratelink2" value="">
+</tr>
+<tr id="auc_shipname_block3">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname3" type="text" name="shipname3" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname3_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set3" ><span id="auc_rate_sheet3" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set3">全国一律送料設定</span></p>
+<p id="auc_shipping_linked3" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data3" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit3" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete3" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input3" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data3"></span>円（税込み）［<a id="auc_uniform_fee_edit3" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete3" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data3" name="shipfee3" value="">
+<input type="hidden" id="auc_shipname_link_data3" name="shipratelink3" value="">
+</tr>
+<tr id="auc_shipname_block4">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname4" type="text" name="shipname4" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname4_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set4" ><span id="auc_rate_sheet4" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set4">全国一律送料設定</span></p>
+<p id="auc_shipping_linked4" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data4" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit4" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete4" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input4" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data4"></span>円（税込み）［<a id="auc_uniform_fee_edit4" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete4" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data4" name="shipfee4" value="">
+<input type="hidden" id="auc_shipname_link_data4" name="shipratelink4" value="">
+</tr>
+<tr id="auc_shipname_block5">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname5" type="text" name="shipname5" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname5_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set5" ><span id="auc_rate_sheet5" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set5">全国一律送料設定</span></p>
+<p id="auc_shipping_linked5" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data5" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit5" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete5" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input5" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data5"></span>円（税込み）［<a id="auc_uniform_fee_edit5" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete5" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data5" name="shipfee5" value="">
+<input type="hidden" id="auc_shipname_link_data5" name="shipratelink5" value="">
+</tr>
+<tr id="auc_shipname_block6">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname6" type="text" name="shipname6" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname6_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set6" ><span id="auc_rate_sheet6" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set6">全国一律送料設定</span></p>
+<p id="auc_shipping_linked6" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data6" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit6" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete6" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input6" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data6"></span>円（税込み）［<a id="auc_uniform_fee_edit6" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete6" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data6" name="shipfee6" value="">
+<input type="hidden" id="auc_shipname_link_data6" name="shipratelink6" value="">
+</tr>
+<tr id="auc_shipname_block7">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname7" type="text" name="shipname7" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname7_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set7" ><span id="auc_rate_sheet7" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set7">全国一律送料設定</span></p>
+<p id="auc_shipping_linked7" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data7" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit7" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete7" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input7" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data7"></span>円（税込み）［<a id="auc_uniform_fee_edit7" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete7" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data7" name="shipfee7" value="">
+<input type="hidden" id="auc_shipname_link_data7" name="shipratelink7" value="">
+</tr>
+<tr id="auc_shipname_block8">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname8" type="text" name="shipname8" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname8_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set8" ><span id="auc_rate_sheet8" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set8">全国一律送料設定</span></p>
+<p id="auc_shipping_linked8" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data8" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit8" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete8" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input8" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data8"></span>円（税込み）［<a id="auc_uniform_fee_edit8" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete8" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data8" name="shipfee8" value="">
+<input type="hidden" id="auc_shipname_link_data8" name="shipratelink8" value="">
+</tr>
+<tr id="auc_shipname_block9">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname9" type="text" name="shipname9" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname9_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set9" ><span id="auc_rate_sheet9" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set9">全国一律送料設定</span></p>
+<p id="auc_shipping_linked9" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data9" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit9" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete9" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input9" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data9"></span>円（税込み）［<a id="auc_uniform_fee_edit9" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete9" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data9" name="shipfee9" value="">
+<input type="hidden" id="auc_shipname_link_data9" name="shipratelink9" value="">
+</tr>
+<tr id="auc_shipname_block10">
+<td width="1%">
+<div class="clr"></div>
+<div class="decFormTxtBox">
+<ul><li><input id="auc_shipname10" type="text" name="shipname10" value="" size="40" maxlength="30"><span>（残り<a id="auc_shipname10_length">15</a>文字）</span></li>
+</ul>
+</div>
+</td>
+<td class="decTx03">
+<p id="auc_shipping_set10" ><span id="auc_rate_sheet10" class="decTx02Off">料金表ページリンク設定</span><span class="decBg01 decTx02Off" id="auc_uniform_fee_set10">全国一律送料設定</span></p>
+<p id="auc_shipping_linked10" style="display: none;">料金表リンク設定済み［<a id="auc_shipping_linked_data10" target="new">リンクをテスト</a>｜<a id="auc_shipping_linked_edit10" href="javascript:void(0);">編集</a>｜<a id="auc_shipping_linked_delete10" href="javascript:void(0);">削除</a>］</p>
+<p id="auc_uniform_fee_input10" style="display: none;">送料全国一律<span id="auc_uniform_fee_input_data10"></span>円（税込み）［<a id="auc_uniform_fee_edit10" href="javascript:void(0);">編集</a>｜<a id="auc_uniform_fee_delete10" href="javascript:void(0);">削除</a>］</p>
+</td>
+<input type="hidden" id="auc_shipname_uniform_fee_data10" name="shipfee10" value="">
+<input type="hidden" id="auc_shipname_link_data10" name="shipratelink10" value="">
+</tr>
+
+<tr>
+<th>&nbsp;</th>
+<td class="decTx02"><p>
+<input id="auc_add_shipform" value="入力欄を追加" type="button">
+</p></td>
+</tr>
+
+</table>
+
+</div>
+
+</td>
+</tr>
+
+<tr>
+<th width="166" class="decFormLabelNml">
+海外発送</th>
+<td id="tips_intl_ok">
+<ul>
+<li><input id="auc_intlOK" type="checkbox" name="intlOK" value="1" checked><label for="auc_intlOK">海外発送にも対応する</label></li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+</fieldset>
+
+</div>
+
+<!--
+/FORM DELIVERY
+-->
+
+<!--
+FORM FOOTER
+-->
+<div id="modFormSbt">
+
+<div class="pts02a">
+<div class="pts02c">
+<div class="clr"></div>
+</div>
+</div>
+
+<div class="alignC">
+<div class="m0Auto w390 cf">
+<div class="floatL mT10"><input id="acMdBack2" onClick="submitDescription(); Ya.submit(document.auction, '/jp/show/topsubmit?fnavi=0');" value="前の画面に戻る" type="button" class="auc_input_back"></div>
+<div class="floatR"><input id="auc_submit2" onClick="return onItemSubmit(this, 'https://auctions.yahoo.co.jp/pageinfo9/jp/show/preview');" value="確認画面へ" type="button"></div>
+</div>
+</div>
+
+</div>
+
+<!--
+FORM FOOTER
+-->
+<script type="text/javascript">
+function onItemSubmit(btnObj, url) {
+	YuD.get(btnObj).disabled = true;
+
+	/* Remove validation if ydod bug on page server is modified  */
+	if (typeof validateDescription == "function" && validateDescription() == false) {
+		YuD.get(btnObj).disabled = false;
+		alert("説明が長すぎますので、短くしてください。");
+		return false;
+	}
+
+	submitDescription();
+	Ya.submit(document.auction, url, '', checkSubmitData);
+	return true;
+}
+
+function onDraftSubmit(url) {
+	/* Remove validation if ydod bug on page server is modified  */
+	if (typeof validateDescription == "function" && validateDescription() == false) {
+		alert("説明が長すぎますので、短くしてください。");
+		return false;
+	}
+
+	configDraft(document.auction, url);
+	return true;
+}
+</script>
+
+</form>
+
+<!--
+FOOTER
+-->
+<div id="Footer">
+<center>
+<hr width="100%">
+<div class="modFootMenu">
+<small>
+<a href="https://privacy.yahoo.co.jp/">プライバシー</a> -
+<a href="https://about.yahoo.co.jp/docs/info/terms/">利用規約</a> -
+<a href="https://premium.yahoo.co.jp/info/guidelines.html/?sc_yprec=yyac_footer">プレミアム利用ガイド</a> -
+<a href="https://auctions.yahoo.co.jp/jp/html/guidelines.html">ガイドライン</a> -
+<a href="https://auctions.yahoo.co.jp/jp/html/tokushoho.html">特定商取引法の表示</a> -
+<a href="https://business.yahoo.co.jp/category2/index.html" onClick="this.href='http://rdsig.yahoo.co.jp/auction/footer/store/evt=81874/RV=1/RU=aHR0cDovL2J1c2luZXNzLnlhaG9vLmNvLmpwL2NhdGVnb3J5Mi9pbmRleC5odG1s'">ストア出店について</a> -
+<a href="https://auctions.yahoo.co.jp/guide/kaizen/">ご意見・ご要望</a> -
+<a href="https://www.yahoo-help.jp/app/home/p/353/">ヘルプ・お問い合わせ</a>
+</small>
+</div>
+<div class="modCopyright">
+<small>Copyright (C) 2020 Yahoo Japan Corporation. All Rights Reserved.</small></div>
+</center>
+</div>
+<!--
+/FOOTER
+-->
+
+<!--
+calender_dlg
+-->
+<!-- start -->
+<div id="calender_dlg" style="display: none;">
+<div id="modDlgBox">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+
+<div class="untHead">
+<p class="pts02"><a href="javascript:void(0);" id="calender_closebtn"><img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/bt_018.gif" alt="閉じる" border="0"></a></p>
+<p id="calender_month"></p>
+<div class="clr"></div>
+</div>
+
+<div class="untBody">
+<p class="decTx02">オークションを終了させたい日付をクリックしてください。ウィンドウを閉じてフォームに戻ります。<br>
+クリックできない日付は終了日として設定できません。</p>
+
+<div class="decCldr">
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<th class="decTxSun">日</th>
+<th>月</th>
+<th>火</th>
+<th>水</th>
+<th>木</th>
+<th>金</th>
+<th>土</th>
+</tr>
+<tr id="calender_week_1"></tr>
+<tr id="calender_week_2"></tr>
+<tr id="calender_week_3"></tr>
+<tr id="calender_week_4"></tr>
+<tr id="calender_week_5"></tr>
+<tr id="calender_week_6"></tr>
+<tr id="calender_week_7"></tr>
+</table>
+<p class="decBgSlctEx"> = 本日</p>
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- end -->
+<!--
+calender_dlg
+-->
+
+<!--
+uniform fee dlg
+-->
+<div id="uniform_fee_dlg" style="display: none;">
+<div id="modDlgBox">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="untHead">
+<p class="pts02"><a href="javascript:void(0);" id="uniform_fee_closebtn"><img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/bt_018.gif" alt="閉じる" border="0"></a></p>
+<p><strong>全国一律送料設定</strong></p>
+<div class="clr"></div>
+</div>
+<div class="untBody">
+<div class="decBgBtm"></div>
+<div id="modAlertBox">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="decBg04">
+<div class="decBg05">
+<div class="decBg06">
+<div class="decBg07">
+<div class="decFormTxtBox">送料全国一律（税込） :
+<input id="auc_uniform_fee" type="text" maxlength="7" value="" size="25">円</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="decTxErrAlrt" style="display: none;" id="uniform_fee_error"><strong>半角数字以外は入力できません</strong></div>
+<div class="untFoot">
+<table cellpadding="4" cellspacing="0" border="0" width="100%">
+<tr>
+<td align="center"><table cellpadding="2" cellspacing="2">
+<tr>
+<td><input id="uniform_fee_okbtn" type="button" value="決定"></td>
+</tr>
+</table></td>
+</tr>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--
+/uniform fee dlg
+-->
+
+<!--
+shippng fee lnk dlg
+-->
+<div id="shippng_fee_lnk_dlg" style="display: none;">
+<div id="modDlgBox">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="untHead">
+<p class="pts02"><a href="javascript:void(0);" id="shippng_fee_lnk_closebtn"><img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/bt_018.gif" alt="閉じる" border="0"></a></p>
+<p><strong>料金表ページリンク設定</strong></p>
+<div class="clr"></div>
+</div>
+<div class="untBody">
+<div class="decBgBtm"></div>
+<p>発送元地域からの料金表ページURLを入力してください（ <span id="auc_shipping_fee_link_test">リンクをテスト</span> ）</p>
+<div class="decFormTxtBox">
+<input id="auc_shipping_fee_link" type="text" maxlength="300" value="" size="106" class="decUrl">
+</div>
+<div class="decTxErrAlrt" style="display: none;" id="shippng_fee_error1"><strong>有効なURLではありません。</strong></div>
+<div class="decTxErrAlrt" style="display: none;" id="shippng_fee_error2"><strong>URLが設定できる長さの上限を超えています。</strong></div>
+<div class="untFoot">
+<p><input id="shippng_fee_lnk_okbtn" type="button" value="決定"></p>
+</div>
+<div class="decCautionBox">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decTx04">
+<p><strong>ウェブ検索で調べる（別ウィンドウが開きます）</strong></p>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<form action="https://search.yahoo.co.jp/search" target="new">
+<td><div class="decFormTxtBox"><input type="text" name="p" value="" size="50" maxlength="200"></div></td>
+<td><input type="submit" value="ウェブ検索"></td>
+</form>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--
+/shippng fee lnk dlg
+-->
+
+
+<!--
+description_alert_dlg
+-->
+<div id="description_alert_dlg" style="visibility:hidden;display:none;">
+<div id="modDlgBox">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+<div class="untHead">
+<p class="pts02"><a id="description_alert_closebtn"><img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/bt_018.gif" alt="閉じる" width="24" height="24" border="0"></a></p>
+<p class="pts01 decCautionTxt"><strong>商品説明が長すぎます</strong></p>
+<div class="clr"></div>
+</div>
+<div class="untBody">
+<div class="decCautionBox">
+<div class="decBg01">
+<div class="decBg02">
+<p><strong>商品説明が長すぎると画像アップロードに失敗します。<br>文字数を減らしてください。</strong></p>
+</div>
+</div>
+</div>
+</div>
+<div class="untFoot">
+<table cellpadding="4" cellspacing="0" border="0" width="100%">
+<tr>
+<td align="center"><table cellpadding="2" cellspacing="2">
+<tr>
+<td><input id="description_alert_cancelbtn" type="button" value="閉じる"></td>
+</tr>
+</table></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--
+description_alert_dlg
+-->
+
+<!--
+reference_price
+-->
+<div id="search_dialog" style="display: none;">
+<div id="modDlgBox">
+<div class="decBg01">
+<div class="decBg02">
+<div class="decBg03">
+
+<div class="untHead">
+<p class="pts02"><a href="javascript:void(0);" id="search_close"><img src="https://s.yimg.jp/images/auct/template/ui/auc_mod/bt_018.gif" alt="閉じる" border="0"></a></p>
+<p><strong>参考価格を検索</strong></p>
+<div class="clr"></div>
+</div>
+<div class="untBody">
+<div class="decBgBtm"></div>
+<p>商品名のキーワードを入力してください。</p>
+<div class="decFormTxtBox">
+<input id="search_words" type="text" maxlength="300" value="" size="106">
+</div>
+<div class="decTxErrAlrt" style="display:none;" id="error_search_words_empty"><strong>検索したい言葉（キーワード）を入力してください。</strong></div>
+<div class="ptsCategoryBox">
+<div class="decBgGray">
+<p class="decTit"><strong>カテゴリ</strong></p>
+<p class="decCategoryPass">オークション&nbsp;&gt;&nbsp;自動車、オートバイ&nbsp;&gt;&nbsp;オートバイ&nbsp;&gt;&nbsp;パーツ&nbsp;&gt;&nbsp;タンク&nbsp;&gt;&nbsp;カワサキ用</p>
+</div>
+</div>
+
+</div>
+
+<div class="untFoot">
+<p><input id="disp_search_result" type="button" value="出品中の現在価格を検索"><span class="decTx04">または</span><input id="disp_old_search_result" type="button" value="過去の落札価格を検索"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--
+/reference_price
+-->
+<form action="" target="new" id="search_form" method="GET">
+<input id="search_words_query" type="hidden" value="" name="p">
+<input type="hidden" name="auccat" value="2084016521">
+<input type="hidden" name="ei" value="EUC-JP">
+<input type="hidden" name="tab_ex" value="commerce">
+<input type="hidden" name="slider" value="0">
+</form>
+
+</div>
+
+
+
+<script type="text/javascript">
+var pageData = {
+"navigation" : {
+"pageName" : "PRODUCT_EDIT",
+"device" : "PC"
+}
+};
+(function () {
+  var tagjs = document.createElement("script");
+  var s = document.getElementsByTagName("script")[0];
+  tagjs.async = true;
+  tagjs.src = "//s.yjtag.jp/tag.js#site=GBd7Bvs";
+  s.parentNode.insertBefore(tagjs, s);
+}());
+</script>
+<noscript>
+  <iframe src="//s.thebrighttag.com/iframe?c=GBd7Bvs" width="1" height="1" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+</noscript>
+</body>
+<script type="text/javascript">
+	YuE.onAvailable("yaucSellItemDiscrpt", initHideInputForm, 3);
+
+	function submit_init() {
+		YuD.get("auc_submit1").disabled=false;
+		YuD.get("auc_submit2").disabled=false;
+		setMarkdownForm();
+		enabledImageComment();
+		checkSafetyDelivery();
+		displayLinkAndFee();
+		inputShippng();
+		checkRemittance();
+		checkUseIntl();
+		addWordCountEvent();
+		checkLocationForYuPack();
+		checkSalesMode();
+		YuD.setStyle("auc_insert_load", "display", "none");
+		YuD.setStyle("auc_insert_form", "display", "block");
+		checkHighLight();
+	}
+	YuE.addListener(window, 'load', submit_init);
+	var FORMTIME = new setDefaultTime("1584510246", "2", "7", "2");
+	YuE.addListener(window, 'load', calender_display);
+	YuE.addListener(window, 'load', createClosingSelectbox);
+	YuE.addListener("auc_loc_cd", 'change', checkLocationForYuPack);
+	YuE.addListener("ClosingDate", 'change', changeClosingDate);
+	YuE.addListener("ClosingTime", 'change', changeClosingTime);
+	var search_url = "http://"+"auctions.search.yahoo.co.jp"+"/search";
+	var old_search_url = "http://"+"closedsearch.auctions.yahoo.co.jp/jp"+"/closedsearch";
+	var search_sample_word = "例）バッグ 黒 新品";
+	YuE.addListener(window, 'load', searchDialogInit);
+	var nodes = YAHOO.util.Selector.query('.auc_longdistshippingJs');
+	YuE.on(nodes, 'click', YAHOO.auction.submit.handleShippingException);
+	YAHOO.auction.submit.handleShippingExceptionAll();
+	YuE.addListener(["auc_StartPrice", "auc_BidOrBuyPrice", "numResubmit", "markdown_ratio"], "change", setMarkdownForm);
+	YuE.addListener(["salesmode_auction", "salesmode_buynow", "salesmode_offer"], "click", setMarkdownForm);
+</script>
+
+</html>
+<script language=javascript>
+if(window.yzq_p==null)document.write("<scr"+"ipt language=javascript src=https://s.yimg.jp/bdv/yahoo/javascript/csc/20060824/lib2obf_b9.js></scr"+"ipt>");
+</script><script language=javascript>
+if(window.yzq_p)yzq_p('P=1wy3cTE4My6YHXJTUzoOMQC.NTkuMQAAAACKZ.FC&T=151famt1a%2fX%3d1584510246%2fE%3d2084313790%2fR%3djp_auc_itm%2fK%3d5%2fV%3d1.1%2fW%3dJ%2fY%3djp%2fF%3d3181911025%2fH%3dc2VjdXJlPXRydWUgYWRjdmVyPTYuOC4x%2fS%3d1%2fJ%3dCA186364');
+if(window.yzq_s)yzq_s();
+</script><noscript><div style="position:absolute;"><img width=1 height=1 alt="" src="https://b9.yahoo.co.jp/b?P=1wy3cTE4My6YHXJTUzoOMQC.NTkuMQAAAACKZ.FC&T=156qe1ci2%2fX%3d1584510246%2fE%3d2084313790%2fR%3djp_auc_itm%2fK%3d5%2fV%3d3.1%2fW%3dJ%2fY%3djp%2fF%3d2582709224%2fH%3dc2VjdXJlPXRydWUgYWRjdmVyPTYuOC4x%2fQ%3d-1%2fS%3d1%2fJ%3dCA186364"></div></noscript>
