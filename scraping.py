@@ -58,5 +58,5 @@ json.dump(product_lists, fw, indent=4, ensure_ascii=False)
 print(product_lists)
 
 # 閉じる
-driver.close()
-driver.quit()
+# driver.close()
+# driver.quit()
