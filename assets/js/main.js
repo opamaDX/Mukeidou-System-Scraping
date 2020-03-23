@@ -1,4 +1,5 @@
 $(function () {
+
     //テキストボックスのフォーカスが外れたら発火
     $("input").blur(function () {
 
@@ -13,5 +14,10 @@ $(function () {
         // 即決価格の値を入力
         $('[data-index=' + index + '].buyout_price').text(buyout_price);
 
+    });
+
+    // ボタンがクリックされると、JSONファイルを出力
+    $("#output_json").click(function (e) {
+        alert("aaa");
     });
 });
