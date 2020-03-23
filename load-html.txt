@@ -1,71 +1,7 @@
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>admin画面</title>
-
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="assets/js/main.js"></script>
-</head>
-
-<body>
-    <!-- JSONを操作するボタン -->
-    <div class="container-fluid">
-        <div class="row">
-            <div class="custom-file col-2 mt-2 ml-5 ">
-                <input type="file" class="custom-file-input" id="customFile">
-                <label class="custom-file-label" data-browse="参照">ファイル選択...</label>
-            </div>
-
-            <button type="button" class="btn btn-primary col-2 mt-2 ml-2 " id="output_json">JSONファイルに保存</button>
-        </div>
-    </div>
-
-
-    <!-- Cards -->
-    <div class="container-fluid">
-        <div class="col-md-12 ml-auto mr-auto">
-            <div class="row .ml-0 .mr-0">
-                <div class="item_card"></div>
-            </div>
-        </div>
-    </div>
-
-
-</body>
-
-</html>
-
-
-<script>
-$(function() {
-
-    var reader;
-
-    // ファイル読み込む
-    function onChange(event) {
-        reader.readAsText(event.target.files[0]);
-    }
-
-    // オブジェクト化
-    function onLoad(event) {
-        generate_html(JSON.parse(event.target.result));
-    }
-
-    // htmlを生成する
-    function generate_html(items) {
-
-        console.log(items);
-
-        console.log( items['k440307089']['price'] );
-
-        for (var cnt = 0; cnt < 30; cnt++) {
-            $(".item_card").after(`<div class="col-lg-4 col-md-4 col-sm-12 mb-4 mt-4 small">
+ <script>
+                document.open();
+                for (var cnt = 0; cnt < 30; cnt++) {
+                    document.write( `<div class="col-lg-4 col-md-4 col-sm-12 mb-4 mt-4 small">
                     <div class="card">
                         <div class="row">
                             <div class="col-6">
@@ -95,7 +31,7 @@ $(function() {
                                     <td>watch数</td>
                                     <td class="text-right">10</td>
                                     <td>現在価格</td>
-                                    <td class="text-right"></td>
+                                    <td class="text-right">10000円</td>
                                 </tr>
                             </tbody>
                             <tbody>
@@ -134,15 +70,7 @@ $(function() {
                             </li>
                         </ul>
                     </div>
-                </div>`);
-        }
-    }
-
-    reader = new FileReader();
-    reader.onload = onLoad;
-
-    // ファイル選択時に発火
-    $('input[type="file"]').on('change', onChange);
-
-});
-</script>
+                </div>`
+                )}
+                document.close();
+                </script>

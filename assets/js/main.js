@@ -1,7 +1,7 @@
 $(function () {
 
     //テキストボックスのフォーカスが外れたら発火
-    $("input").blur(function () {
+    $(document).on("blur", "input", function () {
 
         // テキストボックスの値を抽出
         var index = $(this).attr("data-index");
@@ -17,7 +17,8 @@ $(function () {
     });
 
     // ボタンがクリックされると、JSONファイルを出力
-    $("#output_json").click(function (e) {
+    $("#output_json").click(function () {
         alert("aaa");
     });
+
 });
