@@ -1,18 +1,18 @@
 $(function () {
 
-    // watch数が0なら赤色に変更
+    // watch数が0なら赤色,1から5は黒,6以上は緑に変更
     $(".watch").each(function () {
 
         let index = $(this).attr("data-index");
-        let watch = $(this).text();
+        let watch = Number( $(this).text() );
 
         if (watch == 0) {
             $('[data-index=' + index + '].watch').addClass("text-danger");
+        } else if (watch >= 6 ) {
+            $('[data-index=' + index + '].watch').addClass("text-success");
         }
 
     })
-
-
 
     //テキストボックスのフォーカスが外れたら発火
     $(document).on("blur", "input", function () {
@@ -27,7 +27,5 @@ $(function () {
 
         // 即決価格の値を入力
         $('[data-index=' + index + '].buyout_price').text(buyout_price);
-
     });
-
 });
