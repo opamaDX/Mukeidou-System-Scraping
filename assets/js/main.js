@@ -52,4 +52,10 @@ $(function () {
         // Tooltipを表示する
         $(this).tooltip('show');
     })
+
+    function disp(url){
+
+        window.open(url, "window_name", "width=300,height=200,scrollbars=yes");
+
+    }
 });
