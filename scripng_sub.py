@@ -9,9 +9,9 @@ driver.get('file:///C:/git/必要なもの/code1.html')
 
 # 使用する変数を定義する
 url_lists             = []
-table_tr_number       = 2
+table_tr_number       = 2  # xpathのtableのtrが2段落目からなので値を2に設定
 product_min_number    = 0
-next_page_link_number = 1
+next_page_link_number = 1  # xpathのtableのtdの値が1からなので値を1に設定
 
 # 落札者なしの全件数を取得
 product_max_number = int(driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table[1]/tbody/tr[2]/td/b[1]').text)
@@ -20,7 +20,8 @@ current_time = datetime.now()
 first_time   = datetime(current_time.year, current_time.month, current_time.day, 20)
 last_time    = datetime(current_time.year, current_time.month, current_time.day, 21)
 
-# 落札者なしで終了日時を条件分岐したurlをすべて取得
+# 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
+# for文で回しても取得することができる可能性がある
 # while product_min_number < product_max_number:
 while product_min_number < 5:
 
@@ -28,24 +29,21 @@ while product_min_number < 5:
     if table_tr_number > 51:
         table_tr_number = 2
         
-        # 次のページに移動
         next_page_link_url = driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table[2]/tbody/tr/td[1]/a[' + str(next_page_link_number) + ']')
         next_page_link_url.click()
-        # 次のページに遷移後、5秒待機
         sleep(3)
         
         next_page_link_number += 1
 
-    # 終了日時の値をxpathから取得
+    # 終了日時の値をxpathから取得し、条件で絞るためにdatetime型に変換
     end_time          = driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[3]/td/form/table[1]/tbody/tr[' + str(table_tr_number) + ']/td[5]').text
-    # 終了日時の時間を条件で絞るためにdatetime型に変換
-    end_time          = str(current_time.year) + '年' + end_time
-    within_range_time = datetime.strptime(end_time, '%Y年%m月%d日 %H時%M分')
+    tmp               = str(current_time.year) + '年' + end_time
+    within_range_time = datetime.strptime(tmp, '%Y年%m月%d日 %H時%M分')
     
     # 終了日時で当日の20時から21時の条件で絞ったurlを一つずつリストに格納
-    # if within_range_time >= first_time and within_range_time <= last_time:
-    url_item = driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[3]/td/form/table[1]/tbody/tr[' + str(table_tr_number) + ']/td[3]/a').get_attribute('href')
-    url_lists.append(url_item)
+    if within_range_time >= first_time and within_range_time <= last_time:
+        url_item = driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[3]/td/form/table[1]/tbody/tr[' + str(table_tr_number) + ']/td[3]/a').get_attribute('href')
+        url_lists.append(url_item)
         
     table_tr_number    += 1
     product_min_number += 1
@@ -53,11 +51,11 @@ while product_min_number < 5:
 # 辞書の定義
 product_lists = {}
 
+# 商品のurlにアクセスし、商品の詳細な情報を取得しJSON形式で出力する
 for url in url_lists:
     
-    # urlを開く
+    # urlを開いた後に5秒待機
     driver.get(url)
-    # urlにアクセスする間前に5秒待機
     sleep(5)
 
     # 辞書の定義
@@ -107,7 +105,6 @@ for url in url_lists:
     # product_lists[product_name] = product_list
     product_lists[ID] = product_list
 
-# JSONに出力
 fw = open('items.json', 'w', encoding = 'utf-8')
 json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
 fw.close()
