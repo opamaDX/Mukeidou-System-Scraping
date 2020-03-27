@@ -14,23 +14,8 @@ $(function () {
 
     })
 
-    // テキストボックスのフォーカスが外れたら発火、数値を入力
-    $(document).on("blur", "input", function () {
-
-        // テキストボックスの値を抽出
-        var index = $(this).attr("data-index");
-        var start_price = $(this).val().toLocaleString();
-        var buyout_price = ( Number(start_price) + Number(2000) ).toLocaleString();
-
-        //開始価格の値を入力
-        // $('[data-index=' + index + '].start_price').text(start_price);
-
-        // 即決価格の値を入力
-        $('[data-index=' + index + '].buyout_price').text(buyout_price);
-    });
-
     // 品番がクリックされたときの処理
-    $('li .product_number').on('click', function () {
+    $(document).on("click","li .product_number",function () {
 
         // 品番をクリップボードにコピーする
         var clipboard = new ClipboardJS('.product_number');
@@ -52,10 +37,4 @@ $(function () {
         // Tooltipを表示する
         $(this).tooltip('show');
     })
-
-    function disp(url){
-
-        window.open(url, "window_name", "width=300,height=200,scrollbars=yes");
-
-    }
 });
