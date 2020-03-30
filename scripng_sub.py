@@ -1,11 +1,14 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 import json
 from time import sleep
 from datetime import datetime
 
 driver = webdriver.Chrome()
-driver.get('file:///C:/git/必要なもの/code1.html')
+driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
 
 # 使用する変数を定義する
 url_lists             = []
@@ -23,7 +26,7 @@ last_time    = datetime(current_time.year, current_time.month, current_time.day,
 # 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
 # for文で回しても取得することができる可能性がある
 # while product_min_number < product_max_number:
-while product_min_number < 5:
+while product_min_number < 49:
 
     # 1ページ目のurl獲得が終了したら次のページに遷移する
     if table_tr_number > 51:
@@ -41,13 +44,16 @@ while product_min_number < 5:
     within_range_time = datetime.strptime(tmp, '%Y年%m月%d日 %H時%M分')
     
     # 終了日時で当日の20時から21時の条件で絞ったurlを一つずつリストに格納
-    if within_range_time >= first_time and within_range_time <= last_time:
-        url_item = driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[3]/td/form/table[1]/tbody/tr[' + str(table_tr_number) + ']/td[3]/a').get_attribute('href')
-        url_lists.append(url_item)
+    # if within_range_time >= first_time and within_range_time <= last_time:
+
+    url_item = driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[3]/td/form/table[1]/tbody/tr[' + str(table_tr_number) + ']/td[3]/a').get_attribute('href')
+    url_lists.append(url_item)
         
     table_tr_number    += 1
     product_min_number += 1
         
+
+print(url_lists)        
 # 辞書の定義
 product_lists = {}
 
@@ -56,7 +62,11 @@ for url in url_lists:
     
     # urlを開いた後に5秒待機
     driver.get(url)
-    sleep(5)
+
+    # footerを待つ
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.element_to_be_clickable((By.ID, 'footer')))
+    # sleep(1)
 
     # 辞書の定義
     product_list = {}
@@ -71,12 +81,17 @@ for url in url_lists:
     # JavaScriptから取得
     # 価格
     price      = driver.execute_script("return pageData.items.price")
+    # price      = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text
     # 開始日時
     start_time = driver.execute_script("return pageData.items.starttime")
+    # start_time = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[4]/td[2]').text
     # 終了日時
     end_time   = driver.execute_script("return pageData.items.endtime")
+    # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
 
     ID         = driver.execute_script("return pageData.items.productID")
+    # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
+
     # xpath
     # # アクセス総数テキスト
     # access_text  = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[1]/th').text
@@ -91,10 +106,12 @@ for url in url_lists:
     # 商品名
     # product_name = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[2]/table/tbody/tr[2]/td').text.split(' ')[1]
 
+    # src        = driver.find_element_by_id("acMdThumPhoto").get_attribute('src')
     # 商品の項目ディクショナリ
     product_list["price"]         = price
     product_list["start_time"]    = start_time
     product_list["end_time"]      = end_time
+    # product_list["src"]           = src
     # product_list["access_text"] = access_text
     # product_list["access"]      = access
     # product_list["watch_text"]  = watch_text
@@ -104,7 +121,9 @@ for url in url_lists:
     # 商品一覧ディクショナリ
     # product_lists[product_name] = product_list
     product_lists[ID] = product_list
+    print(product_lists)
 
 fw = open('items.json', 'w', encoding = 'utf-8')
 json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
 fw.close()
+driver.quit()
