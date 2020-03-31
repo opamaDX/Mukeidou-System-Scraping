@@ -33,17 +33,31 @@ $(function () {
                 }
 
                 // htmlカード挿入
-                html += getRow(cnt, key, items[key],discount_price);
+                html += getRow(cnt, key, items[key], discount_price);
                 cnt++;
             }
 
             // htmlを表示
             $("#product").html(html);
+
+            // watch数が0なら赤色,1から5は黒,6以上は緑に変更
+            $(".watch").each(function () {
+
+                let index = $(this).attr("data-index");
+                let watch = Number($(this).text());
+
+                if (watch == 0) {
+                    $('[data-index=' + index + '].watch').addClass("text-danger");
+                } else if (watch >= 6) {
+                    $('[data-index=' + index + '].watch').addClass("text-success");
+                }
+            })
+
         })
     })
 
     // 表示するhtml
-    function getRow(cnt, key, item,discount_price) {
+    function getRow(cnt, key, item, discount_price) {
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
             <img class="card-img-top" src="img/parts.jpg">

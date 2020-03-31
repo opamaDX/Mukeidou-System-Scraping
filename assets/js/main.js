@@ -1,21 +1,11 @@
 $(function () {
 
-    // watch数が0なら赤色,1から5は黒,6以上は緑に変更
-    $(".watch").each(function () {
-
-        let index = $(this).attr("data-index");
-        let watch = Number($(this).text());
-
-        if (watch == 0) {
-            $('[data-index=' + index + '].watch').addClass("text-danger");
-        } else if (watch >= 6) {
-            $('[data-index=' + index + '].watch').addClass("text-success");
-        }
-
+    $(document).on("load", ".watch", function () {
+        alert("a");
     })
 
     // 品番がクリックされたときの処理
-    $(document).on("click","li .product_number",function () {
+    $(document).on("click", "li .product_number", function () {
 
         // 品番をクリップボードにコピーする
         var clipboard = new ClipboardJS('.product_number');
@@ -37,4 +27,8 @@ $(function () {
         // Tooltipを表示する
         $(this).tooltip('show');
     })
+
+    $('#save').on('click', function() {
+        alert("クリックされました");
+    });
 });
