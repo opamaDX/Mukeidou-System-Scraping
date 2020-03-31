@@ -1,9 +1,5 @@
 $(function () {
 
-    $(document).on("load", ".watch", function () {
-        alert("a");
-    })
-
     // 品番がクリックされたときの処理
     $(document).on("click", "li .product_number", function () {
 
@@ -26,6 +22,11 @@ $(function () {
 
         // Tooltipを表示する
         $(this).tooltip('show');
+    })
+
+    // 
+    $(document).on("blur","input", function () {
+        alert("a");
     })
 
     $('#save').on('click', function() {

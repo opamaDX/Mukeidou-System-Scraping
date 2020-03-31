@@ -53,7 +53,28 @@ $(function () {
                 }
             })
 
+            // 増減率の表示
+            $(".input_price").each(function() {
+
+                let index = $(this).attr("data-index");
+                let input_price = $(this).val();
+                let buyout_price = $('[data-index=' + index + '].buyout_price').text();
+
+                // 小数点以下を切り捨てて、増減率を算出
+                range = ( input_price / buyout_price -1 ) * 100;
+                range = Math.floor(range);
+
+                // 増減率のテキスト表示
+                $('[data-index=' + index + '].range').text(range + "%");
+
+                // 増減率の絶対値が30以上なら、フォームとテキストを赤くする
+                if ( Math.abs(range) >= 30 ) {
+                    $('[data-index=' + index + '].range').addClass("text-danger");
+                    $('[data-index=' + index + '].input_price').addClass("bg-danger");
+                }
+            })
         })
+
     })
 
     // 表示するhtml
@@ -79,7 +100,7 @@ $(function () {
                         </div>
                     </form>
                 </li>
-                <li class="list-group-item py-1">増減率<span class="float-right">5%↑</span></li>
+                <li class="list-group-item py-1">増減率<span class="float-right range" data-index=${cnt}></span></li>
             </ul>
         </div>
     </div>`;
