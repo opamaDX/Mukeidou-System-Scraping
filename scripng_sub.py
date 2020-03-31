@@ -8,8 +8,6 @@ import json
 from time import sleep
 from datetime import datetime
 
-#7
-
 driver = webdriver.Chrome()
 driver.get('file:///C:/git/必要なもの/code1.html')
 driver.maximize_window()
@@ -129,11 +127,12 @@ while True:
 
             sleep(3)
     # 今の所すべての例外を取得する形でいくがその都度、例外の処理を付け加えていく可能性もある
-    # except:
-        # pass
+    except:
+        pass
     # どんなエラー処理が発生するか確認する
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+        # print(e)
+        # pass
     else:
         fw = open('items.json', 'w', encoding = 'utf-8')
         json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
