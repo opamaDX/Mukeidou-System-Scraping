@@ -30,6 +30,7 @@ $(function () {
         let index = $(this).attr("data-index");
         let input_price = $(this).val();
         let buyout_price = $('[data-index=' + index + '].buyout_price').text();
+            buyout_price = Number( buyout_price.split(',').join('') );
 
         // 小数点以下を切り捨てて、増減率を算出
         range = (input_price / buyout_price - 1) * 100;
@@ -53,15 +54,33 @@ $(function () {
 
         var text = "テストテキストデータ";
 
-        originalData = {
-            "k440307089": {
-                "price": "15800",
-                "start_time": "2020-03-18 10:56:00",
-                "end_time": "2020-03-18 11:01:59"
-            }
-        }
+        $(".input_price").each(function() {
 
-        console.log(originalData);
+                let index = $(this).attr("data-index");
+                let input_price = $(this).val();
+                let buyout_price = $('[data-index=' + index + '].buyout_price').text();
+                    buyout_price = Number( buyout_price.split(',').join('') );
+                let price = $(this).val();
+
+                console.log(index);
+        })
+
+        // 配列初期化
+        const return_items = {};
+
+        return_items["k440307089"] = {}
+        return_items["k440307089"]["price"] = "15800";
+        return_items["k440307089"]["url"] = "http://~~~";
+
+        return_items["a"] = {}
+        return_items["a"]["price"] = "15800";
+        return_items["a"]["url"] = "http://~~~";
+
+        var json = JSON.stringify( return_items );
+
+        console.log( json );
+
+        text = json;
 
         // バイナリデータ作成
         var blob = new Blob([text], { type: "application/json" });

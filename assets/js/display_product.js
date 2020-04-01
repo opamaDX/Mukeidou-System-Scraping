@@ -59,6 +59,7 @@ $(function () {
                 let index = $(this).attr("data-index");
                 let input_price = $(this).val();
                 let buyout_price = $('[data-index=' + index + '].buyout_price').text();
+                    buyout_price = Number( buyout_price.split(',').join('') );
 
                 // 小数点以下を切り捨てて、増減率を算出
                 range = ( input_price / buyout_price -1 ) * 100;
@@ -96,7 +97,7 @@ $(function () {
                 <li class="list-group-item">
                     <form>
                         <div class="form-group m-0">
-                            <input type="text" class="form-control input_price" style="font-weight: bold;" data-index=${cnt} value=${discount_price} placeholder="価格を入力">
+                            <input type="text" class="form-control input_price text-right" style="font-weight: bold;" data-index=${cnt} value=${discount_price} placeholder="価格を入力">
                         </div>
                     </form>
                 </li>
