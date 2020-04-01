@@ -92,7 +92,7 @@ $(function () {
                 <li class="list-group-item py-1">管理番号<span class="float-right product_number" data-index=${cnt} data-clipboard-text="${key}">${key}</span></li>
                 <li class="list-group-item py-1">アクセス<span class="float-right">60</span></li>
                 <li class="list-group-item font-weight-bold py-1"><span class="text-danger">ウォッチ</span><span class="float-right watch" data-index=${cnt}>${cnt}</span></li>
-                <li class="list-group-item font-weight-bold py-1"><span class="text-danger">即決価格</span><span class="float-right buyout_price" data-index=${cnt}>${item["price"]}</span></li>
+                <li class="list-group-item font-weight-bold py-1"><span class="text-danger">即決価格</span><span class="float-right buyout_price" data-index=${cnt}>${ Number( item["price"] ).toLocaleString() }</span></li>
                 <li class="list-group-item">
                     <form>
                         <div class="form-group m-0">

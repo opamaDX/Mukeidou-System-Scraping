@@ -48,7 +48,35 @@ $(function () {
         }
     })
 
+    // 入力値をjson形式で保存する
     $('#save').on('click', function () {
-        alert("クリックされました");
+
+        var text = "テストテキストデータ";
+
+        originalData = {
+            "k440307089": {
+                "price": "15800",
+                "start_time": "2020-03-18 10:56:00",
+                "end_time": "2020-03-18 11:01:59"
+            }
+        }
+
+        console.log(originalData);
+
+        // バイナリデータ作成
+        var blob = new Blob([text], { type: "application/json" });
+
+        // IEか他ブラウザの判定
+        if (window.navigator.msSaveBlob) {
+            // IEなら独自関数使用
+            window.navigator.msSaveBlob(blob, "edit.json");
+        } else {
+            // IE以外はaタグでイベント発火
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.target = '_blank';
+            a.download = 'edit.json';
+            a.click();
+        }
     });
 });
