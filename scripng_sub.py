@@ -2,13 +2,15 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 import time
 import json
 from time import sleep
 from datetime import datetime
 
 driver = webdriver.Chrome()
-driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
+driver.get('file:///C:/git/必要なもの/code1.html')
+driver.maximize_window()
 
 # 使用する変数を定義する
 url_lists             = []
@@ -26,7 +28,7 @@ last_time    = datetime(current_time.year, current_time.month, current_time.day,
 # 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
 # for文で回しても取得することができる可能性がある
 # while product_min_number < product_max_number:
-while product_min_number < 49:
+while product_min_number < 5:
 
     # 1ページ目のurl獲得が終了したら次のページに遷移する
     if table_tr_number > 51:
@@ -53,77 +55,87 @@ while product_min_number < 49:
     product_min_number += 1
         
 
-print(url_lists)        
-# 辞書の定義
-product_lists = {}
+# print(url_lists)        
 
 # 商品のurlにアクセスし、商品の詳細な情報を取得しJSON形式で出力する
-for url in url_lists:
-    
-    # urlを開いた後に5秒待機
-    driver.get(url)
-
-    # footerを待つ
-    wait = WebDriverWait(driver, 10)
-    wait.until(EC.element_to_be_clickable((By.ID, 'footer')))
-    # sleep(1)
-
+while True:
     # 辞書の定義
-    product_list = {}
+    product_lists = {}
+    try:
+        for url in url_lists:
+             # urlを開いた後に5秒待機
+            driver.get(url)
 
-    # img = driver.find_element_by_id('acMdThumPhoto')
+            # footerを待つ
+            wait = WebDriverWait(driver, 10)
+            wait.until(EC.element_to_be_clickable((By.ID, 'footer')))
 
-    # elementの取得
+            # 辞書の定義
+            product_list = {}
 
-    # value = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text.replace("円", "")
-    # value = driver.find_element_by_css_selector('.decTxtBuyPrice').text.replace("円", "")
+            # img = driver.find_element_by_id('acMdThumPhoto')
 
-    # JavaScriptから取得
-    # 価格
-    price      = driver.execute_script("return pageData.items.price")
-    # price      = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text
-    # 開始日時
-    start_time = driver.execute_script("return pageData.items.starttime")
-    # start_time = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[4]/td[2]').text
-    # 終了日時
-    end_time   = driver.execute_script("return pageData.items.endtime")
-    # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
+            # elementの取得
 
-    ID         = driver.execute_script("return pageData.items.productID")
-    # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
+            # value = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text.replace("円", "")
+            # value = driver.find_element_by_css_selector('.decTxtBuyPrice').text.replace("円", "")
 
-    # xpath
-    # # アクセス総数テキスト
-    # access_text  = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[1]/th').text
-    # # アクセス総数の数値
-    # access       = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[1]/td').text.split(' ')[1]
-    # # ウォッチリストに追加された数テキスト
-    # watch_text   = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[2]/th').text
-    # # ウォッチリストに追加された数値
-    # watch        = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[2]/td').text.split(' ')[1]
-    # # 再出品URL
-    # relist_url            = driver.find_element_by_xpath('//*[@id="modAlertBox"]/div/div/div/div/div/div/div/div[1]/p/strong/a').get_attribute('href')
-    # 商品名
-    # product_name = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[2]/table/tbody/tr[2]/td').text.split(' ')[1]
+            # JavaScriptから取得
+            # 価格
+            price      = driver.execute_script("return pageData.items.price")
+            # price      = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text
+            # 開始日時
+            start_time = driver.execute_script("return pageData.items.starttime")
+            # start_time = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[4]/td[2]').text
+            # 終了日時
+            end_time   = driver.execute_script("return pageData.items.endtime")
+            # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
 
-    # src        = driver.find_element_by_id("acMdThumPhoto").get_attribute('src')
-    # 商品の項目ディクショナリ
-    product_list["price"]         = price
-    product_list["start_time"]    = start_time
-    product_list["end_time"]      = end_time
-    # product_list["src"]           = src
-    # product_list["access_text"] = access_text
-    # product_list["access"]      = access
-    # product_list["watch_text"]  = watch_text
-    # product_list["watch"]       = watch
-    # product_list["url"]           = relist_url
+            ID         = driver.execute_script("return pageData.items.productID")
+            # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
 
-    # 商品一覧ディクショナリ
-    # product_lists[product_name] = product_list
-    product_lists[ID] = product_list
-    print(product_lists)
+            # xpath
+            # # アクセス総数テキスト
+            # access_text  = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[1]/th').text
+            # # アクセス総数の数値
+            # access       = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[1]/td').text.split(' ')[1]
+            # # ウォッチリストに追加された数テキスト
+            # watch_text   = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[2]/th').text
+            # # ウォッチリストに追加された数値
+            # watch        = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[2]/td').text.split(' ')[1]
+            # # 再出品URL
+            # relist_url            = driver.find_element_by_xpath('//*[@id="modAlertBox"]/div/div/div/div/div/div/div/div[1]/p/strong/a').get_attribute('href')
+            # 商品名
+            # product_name = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[2]/table/tbody/tr[2]/td').text.split(' ')[1]
 
-fw = open('items.json', 'w', encoding = 'utf-8')
-json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
-fw.close()
-driver.quit()
+            # src        = driver.find_element_by_id("acMdThumPhoto").get_attribute('src')
+            # 商品の項目ディクショナリ
+            product_list["price"]         = price
+            product_list["start_time"]    = start_time
+            product_list["end_time"]      = end_time
+            # product_list["src"]           = src
+            # product_list["access_text"] = access_text
+            # product_list["access"]      = access
+            # product_list["watch_text"]  = watch_text
+            # product_list["watch"]       = watch
+            # product_list["url"]           = relist_url
+
+            # 商品一覧ディクショナリ
+            # product_lists[product_name] = product_list
+            product_lists[ID] = product_list
+            print(product_lists)
+
+            sleep(3)
+    # 今の所すべての例外を取得する形でいくがその都度、例外の処理を付け加えていく可能性もある
+    except:
+        pass
+    # どんなエラー処理が発生するか確認する
+    # except Exception as e:
+        # print(e)
+        # pass
+    else:
+        fw = open('items.json', 'w', encoding = 'utf-8')
+        json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
+        fw.close()
+        driver.quit()
+        break
