@@ -9,7 +9,7 @@ from time import sleep
 from datetime import datetime
 
 driver = webdriver.Chrome()
-driver.get('file:///C:/git/必要なもの/code1.html')
+driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
 driver.maximize_window()
 
 # 使用する変数を定義する
@@ -61,10 +61,24 @@ while product_min_number < 5:
 while True:
     # 辞書の定義
     product_lists = {}
+    # 全角半角の定義
+    ZEN = "".join(chr(0xff01 + i) for i in range(94))
+    HAN = "".join(chr(0x21 + i) for i in range(94))
+
+    ZEN2HAN = str.maketrans(ZEN, HAN)
+    HAN2ZEN = str.maketrans(HAN, ZEN)
+
     try:
         for url in url_lists:
-             # urlを開いた後に5秒待機
+            # urlを開く
             driver.get(url)
+
+            # 全角半角の定義
+            ZEN = "".join(chr(0xff01 + i) for i in range(94))
+            HAN = "".join(chr(0x21 + i) for i in range(94))
+
+            ZEN2HAN = str.maketrans(ZEN, HAN)
+            HAN2ZEN = str.maketrans(HAN, ZEN)
 
             # footerを待つ
             wait = WebDriverWait(driver, 10)
@@ -91,7 +105,7 @@ while True:
             end_time   = driver.execute_script("return pageData.items.endtime")
             # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
 
-            ID         = driver.execute_script("return pageData.items.productID")
+            # ID         = driver.execute_script("return pageData.items.productID")
             # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
 
             # xpath
@@ -106,7 +120,9 @@ while True:
             # # 再出品URL
             # relist_url   = driver.find_element_by_xpath('//*[@id="modAlertBox"]/div/div/div/div/div/div/div/div[1]/p/strong/a').get_attribute('href')
             # 商品名
-            # product_name = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[2]/table/tbody/tr[2]/td').text.split(' ')[1]
+            get_product_name = driver.find_element_by_xpath('//*[@id="adoc"]/div[2]/div[2]/div/center/font').text.strip('※')
+            product_name = get_product_name.translate(ZEN2HAN)
+            # product_name = ID
 
             # src        = driver.find_element_by_id("acMdThumPhoto").get_attribute('src')
             # 商品の項目ディクショナリ
@@ -121,11 +137,12 @@ while True:
             # product_list["url"]         = relist_url
 
             # 商品一覧ディクショナリ
-            # product_lists[product_name] = product_list
-            product_lists[ID] = product_list
+            product_lists[product_name] = product_list
+            # product_lists[ID] = product_list
             print(product_lists)
 
             sleep(3)
+            
     # 今の所すべての例外を取得する形でいくがその都度、例外の処理を付け加えていく可能性もある
     except:
         pass
