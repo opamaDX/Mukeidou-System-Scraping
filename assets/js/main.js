@@ -6,6 +6,10 @@ $(function () {
         // 品番をクリップボードにコピーする
         var clipboard = new ClipboardJS('.product_number');
 
+        clipboard.on('error', function(e) {
+            alert("コピーに失敗しました…");
+        });
+
         // Tooltipの設定
         $(this).tooltip({
             title: 'コピー完了!',
