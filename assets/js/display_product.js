@@ -10,14 +10,14 @@ $(function () {
             var cnt = 0;
             var discount_price = 0;
 
+            // price_list.jsonの長さを取得
+            list_length = price_list["prices"].length;
+
             // html要素を追加
             for (let key in items) {
 
                 // 現在価格を取得
                 price = items[key]["price"];
-
-                // リストの長さを取得
-                list_length = price_list["prices"].length;
 
                 // 一段階下げた値段を取得
                 for (var list_cnt = 0; list_cnt < list_length; list_cnt++) {
@@ -54,28 +54,30 @@ $(function () {
             })
 
             // 増減率の表示
-            $(".input_price").each(function() {
+            $(".input_price").each(function () {
 
                 let index = $(this).attr("data-index");
                 let input_price = $(this).val();
                 let buyout_price = $('[data-index=' + index + '].buyout_price').text();
-                    buyout_price = Number( buyout_price.split(',').join('') );
+                buyout_price = Number(buyout_price.split(',').join(''));
 
                 // 小数点以下を切り捨てて、増減率を算出
-                range = ( input_price / buyout_price -1 ) * 100;
+                range = (input_price / buyout_price - 1) * 100;
                 range = Math.floor(range);
 
                 // 増減率のテキスト表示
                 $('[data-index=' + index + '].range').text(range + "%");
 
-                // 増減率の絶対値が30以上なら、フォームとテキストを赤くする
-                if ( Math.abs(range) >= 30 ) {
+                // 増減率の絶対値が30以上なら赤、0なら黄色に変更
+                if (Math.abs(range) >= 30) {
                     $('[data-index=' + index + '].range').addClass("text-danger");
-                    $('[data-index=' + index + '].input_price').addClass("bg-danger");
+                    $('[data-index=' + index + '].input_price').css('background-color', '#FC9592');
+                } else if (Math.abs(range == 0)) {
+                    $('[data-index=' + index + '].input_price').addClass("bg-warning");
                 }
+
             })
         })
-
     })
 
     // 表示するhtml
@@ -92,8 +94,8 @@ $(function () {
                 <li class="list-group-item py-1">終了日時<span class="float-right">${item["end_time"]}</span></li>
                 <li class="list-group-item py-1">管理番号<span class="float-right product_number" data-index=${cnt} data-clipboard-text="${key}">${key}</span></li>
                 <li class="list-group-item py-1">アクセス<span class="float-right">60</span></li>
-                <li class="list-group-item font-weight-bold py-1"><span class="text-danger">ウォッチ</span><span class="float-right watch" data-index=${cnt}>${cnt}</span></li>
-                <li class="list-group-item font-weight-bold py-1"><span class="text-danger">即決価格</span><span class="float-right buyout_price" data-index=${cnt}>${ Number( item["price"] ).toLocaleString() }</span></li>
+                <li class="list-group-item py-1"><span class="">ウォッチ</span><span style="font-size: 1rem;" class="float-right watch font-weight-bold" data-index=${cnt}>${cnt}</span></li>
+                <li class="list-group-item font-weight-bold py-1"><span class="text-danger">即決価格</span><span style="font-size: 1rem;" class="float-right buyout_price" data-index=${cnt}>${Number(item["price"]).toLocaleString()}</span></li>
                 <li class="list-group-item">
                     <form>
                         <div class="form-group m-0">

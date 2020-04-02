@@ -30,7 +30,7 @@ $(function () {
         let index = $(this).attr("data-index");
         let input_price = $(this).val();
         let buyout_price = $('[data-index=' + index + '].buyout_price').text();
-            buyout_price = Number( buyout_price.split(',').join('') );
+        buyout_price = Number(buyout_price.split(',').join(''));
 
         // 小数点以下を切り捨てて、増減率を算出
         range = (input_price / buyout_price - 1) * 100;
@@ -42,48 +42,34 @@ $(function () {
         // 増減率の絶対値が30以上なら、フォームとテキストを赤くする
         if (Math.abs(range) >= 30) {
             $('[data-index=' + index + '].range').addClass("text-danger");
-            $('[data-index=' + index + '].input_price').addClass("bg-danger");
+            $('[data-index=' + index + '].input_price').css('background-color','#FC9592');
         } else {
             $('[data-index=' + index + '].range').removeClass("text-danger");
-            $('[data-index=' + index + '].input_price').removeClass("bg-danger");
+            $('[data-index=' + index + '].input_price').css('background-color','');
         }
     })
 
     // 入力値をjson形式で保存する
     $('#save').on('click', function () {
 
-        var text = "テストテキストデータ";
+        // 配列初期化
+        var return_items = {};
 
-        $(".input_price").each(function() {
+        $(".input_price").each(function () {
+            let index = $(this).attr("data-index");
+            let input_price = $(this).val();
+            let product_number = $('[data-index=' + index + '].product_number').text();
 
-                let index = $(this).attr("data-index");
-                let input_price = $(this).val();
-                let buyout_price = $('[data-index=' + index + '].buyout_price').text();
-                    buyout_price = Number( buyout_price.split(',').join('') );
-                let price = $(this).val();
-
-                console.log(index);
+            return_items[product_number] = {};
+            return_items[product_number]["price"] = input_price;
         })
 
-        // 配列初期化
-        const return_items = {};
+        return_items["date"] = "2020年4月2日（テスト）"
 
-        return_items["k440307089"] = {}
-        return_items["k440307089"]["price"] = "15800";
-        return_items["k440307089"]["url"] = "http://~~~";
-
-        return_items["a"] = {}
-        return_items["a"]["price"] = "15800";
-        return_items["a"]["url"] = "http://~~~";
-
-        var json = JSON.stringify( return_items );
-
-        console.log( json );
-
-        text = json;
+        var json = JSON.stringify(return_items);
 
         // バイナリデータ作成
-        var blob = new Blob([text], { type: "application/json" });
+        var blob = new Blob([json], { type: "application/json" });
 
         // IEか他ブラウザの判定
         if (window.navigator.msSaveBlob) {
