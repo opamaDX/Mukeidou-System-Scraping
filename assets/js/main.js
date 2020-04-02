@@ -42,10 +42,10 @@ $(function () {
         // 増減率の絶対値が30以上なら、フォームとテキストを赤くする
         if (Math.abs(range) >= 30) {
             $('[data-index=' + index + '].range').addClass("text-danger");
-            $('[data-index=' + index + '].input_price').css('background-color','#FC9592');
+            $('[data-index=' + index + '].input_price').css('background-color', '#FC9592');
         } else {
             $('[data-index=' + index + '].range').removeClass("text-danger");
-            $('[data-index=' + index + '].input_price').css('background-color','');
+            $('[data-index=' + index + '].input_price').css('background-color', '');
         }
     })
 
@@ -55,17 +55,23 @@ $(function () {
         // 配列初期化
         var return_items = {};
 
+        // フォームに入力した価格を配列に追加
         $(".input_price").each(function () {
             let index = $(this).attr("data-index");
             let input_price = $(this).val();
             let product_number = $('[data-index=' + index + '].product_number').text();
+            let flag = $('[data-index=' + index + '].card_number').attr('data-flag');
 
-            return_items[product_number] = {};
-            return_items[product_number]["price"] = input_price;
+            if (flag == 1) {
+                return_items[product_number] = {};
+                return_items[product_number]["price"] = input_price;
+            }
         })
 
+        // セレクト指定した日時を配列に追加
         return_items["date"] = "2020年4月2日（テスト）"
 
+        // json形式に変換
         var json = JSON.stringify(return_items);
 
         // バイナリデータ作成
@@ -84,4 +90,24 @@ $(function () {
             a.click();
         }
     });
+
+    // 画像上部のボタンがクリックされた時の、チェックの付け外し
+    $(document).on("click", ".top_image .card_number", function () {
+
+        // カードの管理番号とフラッグを取得
+        let index = $(this).attr("data-index");
+        let flag = $(this).attr("data-flag");
+
+        if (flag == 0 && window.confirm('チェックを付けますか？')) {
+            $('[data-index=' + index + '].card_number').removeClass("btn-danger");
+            $('[data-index=' + index + '].card_number').addClass("btn-primary");
+            $('[data-index=' + index + '].card_number').attr('data-flag', 1)
+        } else { }
+
+        if (flag == 1 && window.confirm('チェックを外しますか？')) {
+            $('[data-index=' + index + '].card_number').removeClass("btn-primary");
+            $('[data-index=' + index + '].card_number').addClass("btn-danger");
+            $('[data-index=' + index + '].card_number').attr('data-flag', 0)
+        } else { }
+    })
 });

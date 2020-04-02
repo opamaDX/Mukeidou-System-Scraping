@@ -40,6 +40,10 @@ $(function () {
             // htmlを表示
             $("#product").html(html);
 
+            // カードの総数を表示
+            items_length = Object.keys(items).length;
+            $("#total").text(items_length);
+
             // watch数が0なら赤色,1から5は黒,6以上は緑に変更
             $(".watch").each(function () {
 
@@ -73,7 +77,7 @@ $(function () {
                     $('[data-index=' + index + '].range').addClass("text-danger");
                     $('[data-index=' + index + '].input_price').css('background-color', '#FC9592');
                 } else if (Math.abs(range == 0)) {
-                    $('[data-index=' + index + '].input_price').addClass("bg-warning");
+                    $('[data-index=' + index + '].input_price').css('background-color','#FFFF00');
                 }
 
             })
@@ -84,7 +88,10 @@ $(function () {
     function getRow(cnt, key, item, discount_price) {
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
-            <img class="card-img-top" src="img/parts.jpg">
+            <div class="top_image" style="position: relative;">
+                <img class="card-img-top" src="img/parts.jpg">
+                <button type="button" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
+            </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
                     <a href="javascript:void(0)" tabindex="-1" onClick="window.open('https://www.google.com/','sub','width=700,height=400,scrollbars=yes')">商品名(クリックで商品ページに遷移)</a>
@@ -95,7 +102,7 @@ $(function () {
                 <li class="list-group-item py-1">管理番号<span class="float-right product_number" data-index=${cnt} data-clipboard-text="${key}">${key}</span></li>
                 <li class="list-group-item py-1">アクセス<span class="float-right">60</span></li>
                 <li class="list-group-item py-1"><span class="">ウォッチ</span><span style="font-size: 1rem;" class="float-right watch font-weight-bold" data-index=${cnt}>${cnt}</span></li>
-                <li class="list-group-item font-weight-bold py-1"><span class="text-danger">即決価格</span><span style="font-size: 1rem;" class="float-right buyout_price" data-index=${cnt}>${Number(item["price"]).toLocaleString()}</span></li>
+                <li class="list-group-item py-1"><span class="">即決価格</span><span style="font-size: 1rem;" class="float-right font-weight-bold buyout_price" data-index=${cnt}>${Number(item["price"]).toLocaleString()}</span></li>
                 <li class="list-group-item">
                     <form>
                         <div class="form-group m-0">
