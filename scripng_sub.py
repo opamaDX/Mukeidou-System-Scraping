@@ -104,7 +104,7 @@ while True:
             # # ウォッチリストに追加された数値
             # watch        = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[2]/td').text.split(' ')[1]
             # # 再出品URL
-            # relist_url            = driver.find_element_by_xpath('//*[@id="modAlertBox"]/div/div/div/div/div/div/div/div[1]/p/strong/a').get_attribute('href')
+            # relist_url   = driver.find_element_by_xpath('//*[@id="modAlertBox"]/div/div/div/div/div/div/div/div[1]/p/strong/a').get_attribute('href')
             # 商品名
             # product_name = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[2]/table/tbody/tr[2]/td').text.split(' ')[1]
 
@@ -118,7 +118,7 @@ while True:
             # product_list["access"]      = access
             # product_list["watch_text"]  = watch_text
             # product_list["watch"]       = watch
-            # product_list["url"]           = relist_url
+            # product_list["url"]         = relist_url
 
             # 商品一覧ディクショナリ
             # product_lists[product_name] = product_list
