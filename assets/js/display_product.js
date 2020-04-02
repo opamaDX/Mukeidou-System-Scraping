@@ -19,10 +19,12 @@ $(function () {
                 // 現在価格を取得
                 price = items[key]["price"];
 
+                last_price = price_list["prices"][list_length - 1];
+
                 // 一段階下げた値段を取得
                 for (var list_cnt = 0; list_cnt < list_length; list_cnt++) {
-                    if (price == 980) {
-                        discount_price = price;
+                    if ( price == last_price ) {
+                        discount_price = last_price;
                         break;
                     } else if (price == price_list["prices"][list_cnt]) {
                         discount_price = price_list["prices"][list_cnt + 1];
