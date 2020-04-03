@@ -122,8 +122,8 @@ while True:
             # 再出品URL
             relist_url   = driver.find_element_by_xpath('//*[@id="l-contentsHead"]/div[2]/div[2]/p/a').get_attribute('href')
             # 商品名
-            get_product_name = driver.find_element_by_xpath('//*[@id="adoc"]/div[2]/div[2]/div/center/font').text.strip('※')
-            product_name = get_product_name.translate(ZEN2HAN)
+            get_product_name = driver.find_element_by_xpath('//*[@id="adoc"]/div[2]/div[2]/div/center/font').text.split('※')[1]
+            product_id = get_product_name.translate(ZEN2HAN)
             # 画像のsrc
             src        = driver.find_element_by_xpath('//*[@id="l-main"]/div/div[1]/div[1]/ul/li[1]/div/img').get_attribute('src')
             # 商品の項目ディクショナリ
@@ -138,7 +138,7 @@ while True:
             product_list["url"]         = relist_url
 
             # 商品一覧ディクショナリ
-            product_lists[product_name] = product_list
+            product_lists[product_id] = product_list
             # product_lists[ID] = product_list
             print(product_lists)
 
