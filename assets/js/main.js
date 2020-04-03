@@ -1,14 +1,12 @@
 $(function () {
 
+    new ClipboardJS('.product_number');
+
     // 品番がクリックされたときの処理
     $(document).on("click", "li .product_number", function () {
 
-        // 品番をクリップボードにコピーする
-        var clipboard = new ClipboardJS('.product_number');
-
-        clipboard.on('error', function(e) {
-            alert("コピーに失敗しました…");
-        });
+        let index = $(this).attr("data-index");
+        console.log(index);
 
         // Tooltipの設定
         $(this).tooltip({
@@ -102,13 +100,13 @@ $(function () {
         let index = $(this).attr("data-index");
         let flag = $(this).attr("data-flag");
 
-        if (flag == 0 && window.confirm('チェックを付けますか？')) {
+        if ( flag == 0 ) {
             $('[data-index=' + index + '].card_number').removeClass("btn-danger");
             $('[data-index=' + index + '].card_number').addClass("btn-primary");
             $('[data-index=' + index + '].card_number').attr('data-flag', 1)
         } else { }
 
-        if (flag == 1 && window.confirm('チェックを外しますか？')) {
+        if ( flag == 1 ) {
             $('[data-index=' + index + '].card_number').removeClass("btn-primary");
             $('[data-index=' + index + '].card_number').addClass("btn-danger");
             $('[data-index=' + index + '].card_number').attr('data-flag', 0)
