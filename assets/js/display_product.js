@@ -16,9 +16,11 @@ $(function () {
             // html要素を追加
             for (let key in items) {
 
-                // 現在価格とURLを取得
+                // 現在価格、URL、ウォッチ数、アクセス数を取得
                 price = items[key]["price"];
                 src = items[key]["src"];
+                watch = items[key]["watch"];
+                access = items[key]["access"];
 
                 last_price = price_list["prices"][list_length - 1];
 
@@ -36,7 +38,7 @@ $(function () {
                 }
 
                 // htmlカード挿入
-                html += getRow(cnt, key, items[key], discount_price,src);
+                html += getRow(cnt, key, items[key], discount_price,src,watch,access);
                 cnt++;
             }
 
@@ -88,7 +90,7 @@ $(function () {
     })
 
     // 表示するhtml
-    function getRow(cnt, key, item, discount_price,src) {
+    function getRow(cnt, key, item, discount_price,src,watch,access) {
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
             <div class="top_image" style="position: relative;">
@@ -103,8 +105,8 @@ $(function () {
             <ul class="list-group list-group-flush">
                 <li class="list-group-item py-1">終了日時<span class="float-right">${item["end_time"]}</span></li>
                 <li class="list-group-item py-1">管理番号<span class="float-right product_number" data-index=${cnt} data-clipboard-text="${key}">${key}</span></li>
-                <li class="list-group-item py-1">アクセス<span class="float-right">60</span></li>
-                <li class="list-group-item py-1"><span class="">ウォッチ</span><span style="font-size: 1rem;" class="float-right watch font-weight-bold" data-index=${cnt}>${cnt}</span></li>
+                <li class="list-group-item py-1">アクセス<span class="float-right">${access}</span></li>
+                <li class="list-group-item py-1"><span class="">ウォッチ</span><span style="font-size: 1rem;" class="float-right watch font-weight-bold" data-index=${cnt}>${watch}</span></li>
                 <li class="list-group-item py-1"><span class="">即決価格</span><span style="font-size: 1rem;" class="float-right font-weight-bold buyout_price" data-index=${cnt}>${Number(item["price"]).toLocaleString()}</span></li>
                 <li class="list-group-item">
                     <form>
