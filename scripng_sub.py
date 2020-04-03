@@ -112,7 +112,7 @@ while True:
             # オークションID
             ID         = driver.execute_script("return pageData.items.productID")
             # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
-
+            product_name = driver.execute_script("return pageData.items.productName")
             # xpath
             
             # アクセス総数の数値
@@ -128,6 +128,7 @@ while True:
             src        = driver.find_element_by_xpath('//*[@id="l-main"]/div/div[1]/div[1]/ul/li[1]/div/img').get_attribute('src')
             # 商品の項目ディクショナリ
             product_list["ID"]            = ID
+            product_list["product_name"]  = product_name
             product_list["price"]         = price
             product_list["start_time"]    = start_time
             product_list["end_time"]      = end_time
