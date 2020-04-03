@@ -109,7 +109,7 @@ $(function () {
                 <li class="list-group-item py-1"><span class="">ウォッチ</span><span style="font-size: 1rem;" class="float-right watch font-weight-bold" data-index=${cnt}>${watch}</span></li>
                 <li class="list-group-item py-1"><span class="">即決価格</span><span style="font-size: 1rem;" class="float-right font-weight-bold buyout_price" data-index=${cnt}>${Number(item["price"]).toLocaleString()}</span></li>
                 <li class="list-group-item">
-                    <form>
+                    <form onsubmit="return false;">
                         <div class="form-group m-0">
                             <input type="text" class="form-control input_price text-right" style="font-weight: bold;" data-index=${cnt} value=${discount_price} placeholder="価格を入力">
                         </div>
