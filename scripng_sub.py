@@ -9,9 +9,15 @@ from time import sleep
 from datetime import datetime
 
 driver = webdriver.Chrome()
-driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
-# driver.get('file:///C:/xampp/htdocs/nakamura/code1.html') 永井テスト用
+# driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
+driver.get('https://order.auctions.yahoo.co.jp/jp/show/mystatus?select=closed&hasWinner=0')
 driver.maximize_window()
+driver.find_element_by_id('username').send_keys("")
+driver.find_element_by_id('btnNext').click()
+sleep(2)
+driver.find_element_by_id('passwd').send_keys("")
+driver.find_element_by_id('btnSubmit').click()
+sleep(3)
 
 # 使用する変数を定義する
 url_lists             = []
@@ -29,7 +35,7 @@ last_time    = datetime(current_time.year, current_time.month, current_time.day,
 # 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
 # for文で回しても取得することができる可能性がある
 # while product_min_number < product_max_number:
-while product_min_number < 5:
+while product_min_number < 50:
 
     # 1ページ目のurl獲得が終了したら次のページに遷移する
     if table_tr_number > 51:
@@ -88,8 +94,6 @@ while True:
             # 辞書の定義
             product_list = {}
 
-            # img = driver.find_element_by_id('acMdThumPhoto')
-
             # elementの取得
 
             # value = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text.replace("円", "")
@@ -105,37 +109,32 @@ while True:
             # 終了日時
             end_time   = driver.execute_script("return pageData.items.endtime")
             # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
-
-            # ID         = driver.execute_script("return pageData.items.productID")
+            # オークションID
+            ID         = driver.execute_script("return pageData.items.productID")
             # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
 
             # xpath
-            # # アクセス総数テキスト
-            # access_text  = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[1]/th').text
-            # # アクセス総数の数値
-            # access       = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[1]/td').text.split(' ')[1]
-            # # ウォッチリストに追加された数テキスト
-            # watch_text   = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[2]/th').text
-            # # ウォッチリストに追加された数値
-            # watch        = driver.find_element_by_xpath('//*[@id="modSellInfoB"]/div[2]/div[1]/table/tbody/tr[2]/td').text.split(' ')[1]
-            # # 再出品URL
-            # relist_url   = driver.find_element_by_xpath('//*[@id="modAlertBox"]/div/div/div/div/div/div/div/div[1]/p/strong/a').get_attribute('href')
+            
+            # アクセス総数の数値
+            access       = driver.find_element_by_xpath('//*[@id="l-sub"]/div[1]/ul/li[2]/dl/dd/ul/li[1]/span[2]').text
+            # ウォッチリストに追加された数値
+            watch        = driver.find_element_by_xpath('//*[@id="l-sub"]/div[1]/ul/li[2]/dl/dd/ul/li[2]/span[2]').text
+            # 再出品URL
+            relist_url   = driver.find_element_by_xpath('//*[@id="l-contentsHead"]/div[2]/div[2]/p/a').get_attribute('href')
             # 商品名
             get_product_name = driver.find_element_by_xpath('//*[@id="adoc"]/div[2]/div[2]/div/center/font').text.strip('※')
             product_name = get_product_name.translate(ZEN2HAN)
-            # product_name = ID
-
-            # src        = driver.find_element_by_id("acMdThumPhoto").get_attribute('src')
+            # 画像のsrc
+            src        = driver.find_element_by_xpath('//*[@id="l-main"]/div/div[1]/div[1]/ul/li[1]/div/img').get_attribute('src')
             # 商品の項目ディクショナリ
+            product_list["ID"]            = ID
             product_list["price"]         = price
             product_list["start_time"]    = start_time
             product_list["end_time"]      = end_time
-            # product_list["src"]           = src
-            # product_list["access_text"] = access_text
-            # product_list["access"]      = access
-            # product_list["watch_text"]  = watch_text
-            # product_list["watch"]       = watch
-            # product_list["url"]         = relist_url
+            product_list["src"]           = src
+            product_list["access"]      = access
+            product_list["watch"]       = watch
+            product_list["url"]         = relist_url
 
             # 商品一覧ディクショナリ
             product_lists[product_name] = product_list
