@@ -16,11 +16,13 @@ $(function () {
             // html要素を追加
             for (let key in items) {
 
-                // 現在価格、URL、ウォッチ数、アクセス数を取得
+                // タイトル、現在価格、画像のsrc、ウォッチ数、アクセス数、urlを取得
+                product_name = items[key]["product_name"];
                 price = items[key]["price"];
                 src = items[key]["src"];
                 watch = items[key]["watch"];
                 access = items[key]["access"];
+                url = items[key]["url"];
 
                 last_price = price_list["prices"][list_length - 1];
 
@@ -38,7 +40,7 @@ $(function () {
                 }
 
                 // htmlカード挿入
-                html += getRow(cnt, key, items[key], discount_price,src,watch,access);
+                html += getRow(cnt, key, items[key], discount_price,src,watch,access,product_name,url);
                 cnt++;
             }
 
@@ -89,8 +91,22 @@ $(function () {
         })
     })
 
+    // 次の3つは等価
+    // localStorage.setItem('apple', '200');
+    // localStorage.apple = '200';
+    localStorage['apple'] = '200';
+    localStorage['apple']['test'] = 'test;'
+
+    // 次の3つも等価
+    // var data = localStorage.getItem('apple');
+    // var data = localStorage.apple;
+    var data = localStorage['apple']['test'];
+
+
+    console.log(data);
+
     // 表示するhtml
-    function getRow(cnt, key, item, discount_price,src,watch,access) {
+    function getRow(cnt, key, item, discount_price,src,watch,access,product_name,url) {
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
             <div class="top_image" style="position: relative;">
@@ -99,7 +115,7 @@ $(function () {
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
-                    <a href="javascript:void(0)" tabindex="-1" onClick="window.open('https://www.google.com/','sub','width=700,height=400,scrollbars=yes')">商品名(クリックで商品ページに遷移)</a>
+                    <a href="javascript:void(0)" tabindex="-1" onClick="window.open('${url}','sub','width=700,height=400,scrollbars=yes')">${product_name}</a>
                 </h6>
             </div>
             <ul class="list-group list-group-flush">
