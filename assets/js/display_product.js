@@ -16,8 +16,9 @@ $(function () {
             // html要素を追加
             for (let key in items) {
 
-                // 現在価格を取得
+                // 現在価格とURLを取得
                 price = items[key]["price"];
+                src = items[key]["src"];
 
                 last_price = price_list["prices"][list_length - 1];
 
@@ -35,7 +36,7 @@ $(function () {
                 }
 
                 // htmlカード挿入
-                html += getRow(cnt, key, items[key], discount_price);
+                html += getRow(cnt, key, items[key], discount_price,src);
                 cnt++;
             }
 
@@ -87,11 +88,11 @@ $(function () {
     })
 
     // 表示するhtml
-    function getRow(cnt, key, item, discount_price) {
+    function getRow(cnt, key, item, discount_price,src) {
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
             <div class="top_image" style="position: relative;">
-                <img class="card-img-top" src="img/parts.jpg">
+                <img class="card-img-top" src=${src}>
                 <button type="button" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
             </div>
             <div class="card-body p-1">

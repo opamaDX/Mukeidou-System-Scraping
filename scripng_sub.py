@@ -10,6 +10,7 @@ from datetime import datetime
 
 driver = webdriver.Chrome()
 driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
+# driver.get('file:///C:/xampp/htdocs/nakamura/code1.html') 永井テスト用
 driver.maximize_window()
 
 # 使用する変数を定義する
