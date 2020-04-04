@@ -12,6 +12,7 @@ driver = webdriver.Chrome()
 # driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
 driver.get('https://order.auctions.yahoo.co.jp/jp/show/mystatus?select=closed&hasWinner=0')
 driver.maximize_window()
+
 driver.find_element_by_id('username').send_keys("")
 driver.find_element_by_id('btnNext').click()
 sleep(2)
@@ -28,9 +29,13 @@ next_page_link_number = 1  # xpathのtableのtdの値が1からなので値を1�
 # 落札者なしの全件数を取得
 product_max_number = int(driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table[1]/tbody/tr[2]/td/b[1]').text)
 
+# 自由に時間を設定することができる
 current_time = datetime.now()
-first_time   = datetime(current_time.year, current_time.month, current_time.day, 20)
-last_time    = datetime(current_time.year, current_time.month, current_time.day, 21)
+# first_time   = datetime(current_time.year, current_time.month, current_time.day, 20)
+# last_time    = datetime(current_time.year, current_time.month, current_time.day, 21)
+first_time   = datetime(2020, 4, 4, 20)
+last_time    = datetime(2020, 4, 4, 21)
+
 
 # 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
 # for文で回しても取得することができる可能性がある
@@ -62,7 +67,7 @@ while product_min_number < 50:
     product_min_number += 1
         
 
-# print(url_lists)        
+print(len(url_lists))        
 
 # 商品のurlにアクセスし、商品の詳細な情報を取得しJSON形式で出力する
 while True:
