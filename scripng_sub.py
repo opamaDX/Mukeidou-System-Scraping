@@ -13,10 +13,10 @@ driver = webdriver.Chrome()
 driver.get('https://order.auctions.yahoo.co.jp/jp/show/mystatus?select=closed&hasWinner=0')
 driver.maximize_window()
 
-driver.find_element_by_id('username').send_keys("mukeidou")
+driver.find_element_by_id('username').send_keys("")
 driver.find_element_by_id('btnNext').click()
 sleep(2)
-driver.find_element_by_id('passwd').send_keys("n@748sps")
+driver.find_element_by_id('passwd').send_keys("")
 driver.find_element_by_id('btnSubmit').click()
 sleep(3)
 
@@ -40,7 +40,7 @@ last_time    = datetime(2020, 4, 4, 21)
 # 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
 # for文で回しても取得することができる可能性がある
 # while product_min_number < product_max_number:
-while product_min_number < 50:
+while product_min_number < 5:
 
     # 1ページ目のurl獲得が終了したら次のページに遷移する
     if table_tr_number > 51:
@@ -67,19 +67,23 @@ while product_min_number < 50:
     product_min_number += 1
         
 
-print(len(url_lists))        
+# print(len(url_lists))
+
+# 何件失敗したかを表示
+error_number = 0
+
+# 辞書の定義
+product_lists = {}
+# 全角半角の定義
+ZEN = "".join(chr(0xff01 + i) for i in range(94))
+HAN = "".join(chr(0x21 + i) for i in range(94))
+
+ZEN2HAN = str.maketrans(ZEN, HAN)
+HAN2ZEN = str.maketrans(HAN, ZEN)
 
 # 商品のurlにアクセスし、商品の詳細な情報を取得しJSON形式で出力する
-while True:
-    # 辞書の定義
-    product_lists = {}
-    # 全角半角の定義
-    ZEN = "".join(chr(0xff01 + i) for i in range(94))
-    HAN = "".join(chr(0x21 + i) for i in range(94))
-
-    ZEN2HAN = str.maketrans(ZEN, HAN)
-    HAN2ZEN = str.maketrans(HAN, ZEN)
-
+# 例外処理が発生した時はその商品のデータを飛ばし次の商品のデータに移行
+for url in url_lists:
     try:
         for url in url_lists:
             # urlを開く
@@ -147,14 +151,13 @@ while True:
             
     # 今の所すべての例外を取得する形でいくがその都度、例外の処理を付け加えていく可能性もある
     except:
+        # 例外処理が発生した場合にその商品のIDを表示エラー件数を1増やす
+        # print(product_id)
+        error_number += 1
+        sleep(3)
         pass
-    # どんなエラー処理が発生するか確認する
-    # except Exception as e:
-        # print(e)
-        # pass
-    else:
-        fw = open('items.json', 'w', encoding = 'utf-8')
-        json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
-        fw.close()
-        driver.quit()
-        break
+fw = open('items.json', 'w', encoding = 'utf-8')
+json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
+fw.close()
+print('エラー' + str(error_number) + '件')
+driver.quit()
