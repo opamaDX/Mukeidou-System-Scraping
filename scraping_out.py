@@ -13,13 +13,14 @@ driver = webdriver.Chrome()
 json_file   = open('edit.json', 'r', encoding = 'utf-8')
 edit_object = json.load(json_file)
 
+hour = edit_object["date"]
 error_number = 0
 
 # 例外処理が発生した時はその商品のデータを飛ばし次の商品に移行
 for key in edit_object:
     try:
         # オークションIDを参照してURLを開く
-        driver.get(edit_object[key]['url'])
+        driver.get(edit_object[key]['relist_url'])
         # 画面最大化
         driver.maximize_window()
         
@@ -37,7 +38,7 @@ for key in edit_object:
         # 即決価格削除
         price.clear()
         # 即決価格修正
-        driver.find_element_by_id('auc_BidOrBuyPrice').send_keys(edit_object[ID]["price"])
+        driver.find_element_by_id('auc_BidOrBuyPrice').send_keys(edit_object[key]["price"])
 
         #ドロップダウン
         # 普通に取得する
@@ -47,7 +48,7 @@ for key in edit_object:
         closing_time_select = Select(closing_time)
 
         # 選択したいvalueを指定する
-        closing_time_select.select_by_value('21')
+        closing_time_select.select_by_value(hour)
 
         # 確認画面へ
         driver.find_element_by_id('auc_submit1').click()
