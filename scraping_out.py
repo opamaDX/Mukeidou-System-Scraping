@@ -12,6 +12,9 @@ driver = webdriver.Chrome()
 json_file   = open('edit.json', 'r', encoding = 'utf-8')
 edit_object = json.load(json_file)
 
+error_number = 0
+auction_id   = ''
+
 for key in edit_object:
     try:
         # オークションIDを参照してURLを開く
@@ -26,7 +29,8 @@ for key in edit_object:
         # 初めのボタンクリック
         driver.find_element_by_id('auc_insertion_ok').click()
         #オークションID取得
-        ID = driver.find_element_by_name('aID').get_attribute('value')
+        ID         = driver.find_element_by_name('aID').get_attribute('value')
+        auction_id = ID
 
         # 即決価格を選択
         price = driver.find_element_by_id('auc_BidOrBuyPrice')
@@ -51,6 +55,9 @@ for key in edit_object:
         time.sleep(3)
     # 今現在全ての例外処理に対応しているので対応した例外処理に変更する
     except:
+        print(auction_id)
+        error_number += 1
+        print('Error : ' + error_number)
         pass
 
 json_file.close()
