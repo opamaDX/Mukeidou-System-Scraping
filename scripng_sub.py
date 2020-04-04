@@ -40,7 +40,7 @@ last_time    = datetime(2020, 4, 4, 21)
 # 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
 # for文で回しても取得することができる可能性がある
 # while product_min_number < product_max_number:
-while product_min_number < 50:
+while product_min_number < 5:
 
     # 1ページ目のurl獲得が終了したら次のページに遷移する
     if table_tr_number > 51:
@@ -67,98 +67,93 @@ while product_min_number < 50:
     product_min_number += 1
         
 
-print(len(url_lists))        
+# print(len(url_lists))
+
+# 何件失敗したかを表示
+error_number = 0
+
+# 辞書の定義
+product_lists = {}
+# 全角半角の定義
+ZEN = "".join(chr(0xff01 + i) for i in range(94))
+HAN = "".join(chr(0x21 + i) for i in range(94))
+
+ZEN2HAN = str.maketrans(ZEN, HAN)
+HAN2ZEN = str.maketrans(HAN, ZEN)
 
 # 商品のurlにアクセスし、商品の詳細な情報を取得しJSON形式で出力する
-while True:
-    # 辞書の定義
-    product_lists = {}
-    # 全角半角の定義
-    ZEN = "".join(chr(0xff01 + i) for i in range(94))
-    HAN = "".join(chr(0x21 + i) for i in range(94))
-
-    ZEN2HAN = str.maketrans(ZEN, HAN)
-    HAN2ZEN = str.maketrans(HAN, ZEN)
-
+# 例外処理が発生した時はその商品のデータを飛ばし次の商品のデータに移行
+for url in url_lists:
     try:
-        for url in url_lists:
-            # urlを開く
-            driver.get(url)
+        # urlを開く
+        driver.get(url)
 
-            # 全角半角の定義
-            ZEN = "".join(chr(0xff01 + i) for i in range(94))
-            HAN = "".join(chr(0x21 + i) for i in range(94))
+        # footerを待つ
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.element_to_be_clickable((By.ID, 'footer')))
 
-            ZEN2HAN = str.maketrans(ZEN, HAN)
-            HAN2ZEN = str.maketrans(HAN, ZEN)
+        # 辞書の定義
+        product_list = {}
 
-            # footerを待つ
-            wait = WebDriverWait(driver, 10)
-            wait.until(EC.element_to_be_clickable((By.ID, 'footer')))
+        # elementの取得
 
-            # 辞書の定義
-            product_list = {}
+        # value = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text.replace("円", "")
+        # value = driver.find_element_by_css_selector('.decTxtBuyPrice').text.replace("円", "")
 
-            # elementの取得
+        # JavaScriptから取得
+        # 価格
+        price      = driver.execute_script("return pageData.items.price")
+        # price      = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text
+        # 開始日時
+        start_time = driver.execute_script("return pageData.items.starttime")
+        # start_time = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[4]/td[2]').text
+        # 終了日時
+        end_time   = driver.execute_script("return pageData.items.endtime")
+        # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
+        # オークションID
+        ID         = driver.execute_script("return pageData.items.productID")
+        # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
+        product_name = driver.execute_script("return pageData.items.productName")
+        # xpath
+        
+        # アクセス総数の数値
+        access       = driver.find_element_by_xpath('//*[@id="l-sub"]/div[1]/ul/li[2]/dl/dd/ul/li[1]/span[2]').text
+        # ウォッチリストに追加された数値
+        watch        = driver.find_element_by_xpath('//*[@id="l-sub"]/div[1]/ul/li[2]/dl/dd/ul/li[2]/span[2]').text
+        # 再出品URL
+        relist_url   = driver.find_element_by_xpath('//*[@id="l-contentsHead"]/div[2]/div[2]/p/a').get_attribute('href')
+        # 商品名
+        get_product_name = driver.find_element_by_xpath('//*[@id="adoc"]/div[2]/div[2]/div/center/font').text.split('※')[1]
+        product_id = get_product_name.translate(ZEN2HAN)
+        # 画像のsrc
+        src        = driver.find_element_by_xpath('//*[@id="l-main"]/div/div[1]/div[1]/ul/li[1]/div/img').get_attribute('src')
+        # 商品の項目ディクショナリ
+        product_list["ID"]            = ID
+        product_list["product_name"]  = product_name
+        product_list["price"]         = price
+        product_list["start_time"]    = start_time
+        product_list["end_time"]      = end_time
+        product_list["src"]           = src
+        product_list["access"]      = access
+        product_list["watch"]       = watch
+        product_list["url"]         = relist_url
 
-            # value = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text.replace("円", "")
-            # value = driver.find_element_by_css_selector('.decTxtBuyPrice').text.replace("円", "")
+        # 商品一覧ディクショナリ
+        product_lists[product_id] = product_list
+        # product_lists[ID] = product_list
+        print(product_lists)
 
-            # JavaScriptから取得
-            # 価格
-            price      = driver.execute_script("return pageData.items.price")
-            # price      = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text
-            # 開始日時
-            start_time = driver.execute_script("return pageData.items.starttime")
-            # start_time = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[4]/td[2]').text
-            # 終了日時
-            end_time   = driver.execute_script("return pageData.items.endtime")
-            # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
-            # オークションID
-            ID         = driver.execute_script("return pageData.items.productID")
-            # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
-            product_name = driver.execute_script("return pageData.items.productName")
-            # xpath
-            
-            # アクセス総数の数値
-            access       = driver.find_element_by_xpath('//*[@id="l-sub"]/div[1]/ul/li[2]/dl/dd/ul/li[1]/span[2]').text
-            # ウォッチリストに追加された数値
-            watch        = driver.find_element_by_xpath('//*[@id="l-sub"]/div[1]/ul/li[2]/dl/dd/ul/li[2]/span[2]').text
-            # 再出品URL
-            relist_url   = driver.find_element_by_xpath('//*[@id="l-contentsHead"]/div[2]/div[2]/p/a').get_attribute('href')
-            # 商品名
-            get_product_name = driver.find_element_by_xpath('//*[@id="adoc"]/div[2]/div[2]/div/center/font').text.split('※')[1]
-            product_id = get_product_name.translate(ZEN2HAN)
-            # 画像のsrc
-            src        = driver.find_element_by_xpath('//*[@id="l-main"]/div/div[1]/div[1]/ul/li[1]/div/img').get_attribute('src')
-            # 商品の項目ディクショナリ
-            product_list["ID"]            = ID
-            product_list["product_name"]  = product_name
-            product_list["price"]         = price
-            product_list["start_time"]    = start_time
-            product_list["end_time"]      = end_time
-            product_list["src"]           = src
-            product_list["access"]      = access
-            product_list["watch"]       = watch
-            product_list["url"]         = relist_url
-
-            # 商品一覧ディクショナリ
-            product_lists[product_id] = product_list
-            # product_lists[ID] = product_list
-            print(product_lists)
-
-            sleep(3)
-            
+        sleep(3)
+        
     # 今の所すべての例外を取得する形でいくがその都度、例外の処理を付け加えていく可能性もある
     except:
+        # 例外処理が発生した場合にその商品のIDを表示エラー件数を1増やす
+        # print(product_id)
+        error_number += 1
+        sleep(3)
         pass
-    # どんなエラー処理が発生するか確認する
-    # except Exception as e:
-        # print(e)
-        # pass
-    else:
-        fw = open('items.json', 'w', encoding = 'utf-8')
-        json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
-        fw.close()
-        driver.quit()
-        break
+fw = open('items.json', 'w', encoding = 'utf-8')
+json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
+fw.close()
+print('エラー' + str(error_number) + '件')
+driver.quit()
