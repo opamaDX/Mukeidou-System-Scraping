@@ -150,3 +150,4 @@
 [0402/180357.895:ERROR:process_reader_win.cc(151)] SuspendThread: アクセスが拒否されました。 (0x5)
 [0402/180357.895:ERROR:process_reader_win.cc(123)] NtOpenThread: {アクセス拒否} プロセスはオブジェクトのアクセスを要求しましたが、アクセス権が与えられていません。 (0xc0000022)
 [0402/180357.895:ERROR:exception_snapshot_win.cc(98)] thread ID 30436 not found in process
+[0403/182649.378:ERROR:prune_crash_reports.cc(35)] PruneCrashReportDatabase: Failed to get pending reports

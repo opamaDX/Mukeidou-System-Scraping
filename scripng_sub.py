@@ -13,10 +13,10 @@ driver = webdriver.Chrome()
 driver.get('https://order.auctions.yahoo.co.jp/jp/show/mystatus?select=closed&hasWinner=0')
 driver.maximize_window()
 
-driver.find_element_by_id('username').send_keys("")
+driver.find_element_by_id('username').send_keys("mukeidou")
 driver.find_element_by_id('btnNext').click()
 sleep(2)
-driver.find_element_by_id('passwd').send_keys("")
+driver.find_element_by_id('passwd').send_keys("n@748sps")
 driver.find_element_by_id('btnSubmit').click()
 sleep(3)
 
@@ -85,19 +85,14 @@ while True:
             # urlを開く
             driver.get(url)
 
-            # 全角半角の定義
-            ZEN = "".join(chr(0xff01 + i) for i in range(94))
-            HAN = "".join(chr(0x21 + i) for i in range(94))
-
-            ZEN2HAN = str.maketrans(ZEN, HAN)
-            HAN2ZEN = str.maketrans(HAN, ZEN)
-
             # footerを待つ
             wait = WebDriverWait(driver, 10)
             wait.until(EC.element_to_be_clickable((By.ID, 'footer')))
 
             # 辞書の定義
             product_list = {}
+            # 詳細ページのURL
+            detail_URL = url
 
             # elementの取得
 
@@ -140,7 +135,8 @@ while True:
             product_list["src"]           = src
             product_list["access"]      = access
             product_list["watch"]       = watch
-            product_list["url"]         = relist_url
+            product_list["detail_URL"]         = detail_URL
+            product_list["relist_url"]         = relist_url
 
             # 商品一覧ディクショナリ
             product_lists[product_id] = product_list
