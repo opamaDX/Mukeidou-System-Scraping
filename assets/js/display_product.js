@@ -34,8 +34,11 @@ $(function () {
                     }
                 }
 
+                test = items[key]["product_name"].trim().replace(/\s+/g, "");
+                console.log(test);
+
                 // htmlカード挿入
-                html += getRow(cnt, key, items[key], discount_price);
+                html += getRow(cnt, key, items[key], discount_price,test);
                 cnt++;
             }
 
@@ -96,7 +99,7 @@ $(function () {
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
-                    <a href="javascript:void(0)" tabindex="-1" onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"]}</a>
+                    <a href="javascript:void(0)" tabindex="-1" onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${test}</a>
                 </h6>
             </div>
             <ul class="list-group list-group-flush">

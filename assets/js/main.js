@@ -5,9 +5,6 @@ $(function () {
     // 品番がクリックされたときの処理
     $(document).on("click", "li .product_number", function () {
 
-        let index = $(this).attr("data-index");
-        console.log(index);
-
         // Tooltipの設定
         $(this).tooltip({
             title: 'コピー完了!',
@@ -64,6 +61,14 @@ $(function () {
             let product_number = $('[data-index=' + index + '].product_number').text();
             let flag = $('[data-index=' + index + '].card_number').attr('data-flag');
 
+            // 増減率が1つでも赤色の場合、処理を中断
+            let range = $('[data-index=' + index + '].range').attr("class");
+            if (range.match(/text-danger/)) {
+                alert(index + "番目の商品の入力価格を変更してください。")
+                javascript_die();
+            }
+
+            // チェックが付いている商品だけ配列に追加
             if (flag == 1) {
                 return_items[product_number] = {};
                 return_items[product_number]["price"] = input_price;
@@ -100,16 +105,22 @@ $(function () {
         let index = $(this).attr("data-index");
         let flag = $(this).attr("data-flag");
 
-        if ( flag == 0 ) {
+        if (flag == 0) {
             $('[data-index=' + index + '].card_number').removeClass("btn-danger");
             $('[data-index=' + index + '].card_number').addClass("btn-primary");
             $('[data-index=' + index + '].card_number').attr('data-flag', 1)
         } else { }
 
-        if ( flag == 1 ) {
+        if (flag == 1) {
             $('[data-index=' + index + '].card_number').removeClass("btn-primary");
             $('[data-index=' + index + '].card_number').addClass("btn-danger");
             $('[data-index=' + index + '].card_number').attr('data-flag', 0)
         } else { }
+    })
+
+    // プルダウンで選択された時の処理
+    $("#sort").change(function () {
+        element = $(this).val();
+        console.log(element);
     })
 });
