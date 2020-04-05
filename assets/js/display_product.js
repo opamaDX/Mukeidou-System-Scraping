@@ -103,7 +103,7 @@ $(function () {
         <div class="card">
             <div class="top_image" style="position: relative;">
                 <img class="card-img-top" src=${item["src"]} data-index=${cnt}>
-                <button type="button" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
+                <button type="button" tabindex="-1" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
