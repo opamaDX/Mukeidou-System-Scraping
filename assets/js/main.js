@@ -120,7 +120,55 @@ $(function () {
 
     // プルダウンで選択された時の処理
     $("#sort").change(function () {
-        element = $(this).val();
-        console.log(element);
+
+        var items = [];
+
+        $(".input_price").each(function () {
+
+            let index          = $(this).attr("data-index");
+            let src            = $('[data-index=' + index + '].card-img-top').attr("src");
+            let product_name   = $('[data-index=' + index + '].product_name').text();
+            let end_time       = $('[data-index=' + index + '].end_time').text();
+            let product_number = $('[data-index=' + index + '].product_number').text();
+            let access         = $('[data-index=' + index + '].access').text();
+            let watch          = $('[data-index=' + index + '].watch').text();
+            let buyout_price   = $('[data-index=' + index + '].buyout_price').text();
+            let input_price    = $('[data-index=' + index + '].input_price').val();
+            let range          = $('[data-index=' + index + '].range').text();
+
+            var item = {
+                "index"          :index,
+                "src"            :src,
+                "product_name"   :product_name,
+                "end_time"       :end_time,
+                "product_number" :product_number,
+                "access"         :access,
+                "watch"          :watch,
+                "buyout_price"   :buyout_price,
+                "input_price"    :input_price,
+                "range"          :range
+            };
+
+            items.push(item);
+        })
+
+        items = JSON.stringify(items);
+        localStorage.setItem("items",items);
+
+        items = localStorage.getItem("items");
+        items = JSON.parse( items );
+        console.log( items[0]["index"] );
     })
 });
+
+// "11BR10": {
+//     "ID": "o357172611",
+//     "product_name": "★【M2】良品♪RG400ガンマ 純正エアダクトset♪RG500♪",
+//     "price": "12800",
+//     "start_time": "2020-04-03 23:21:07",
+//     "end_time": "2020-04-04 13:47:30",
+//     "src": "https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0511/users/936e6f3f69d1730e2ed6e42e1e499ecc06b9bdad/i-img600x450-1574224653rg0nz74980.jpg",
+//     "access": "0",
+//     "watch": "4",
+//     "url": "https://auctions.yahoo.co.jp/pageinfo23/jp/show/resubmit?aID=o357172611"
+// },
