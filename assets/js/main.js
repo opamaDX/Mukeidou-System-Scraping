@@ -151,7 +151,7 @@ $(function () {
                 "buyout_price": buyout_price,
                 "input_price": input_price,
                 "range": range,
-                "url":url
+                "url": url
             };
 
             items.push(item);
@@ -181,6 +181,44 @@ $(function () {
 
         // ソートした製品を表示
         $("#product").html(sorting_html);
+
+        // watch数が0なら赤色,1から5は黒,6以上は緑に変更
+        $(".watch").each(function () {
+
+            let index = $(this).attr("data-index");
+            let watch = Number($(this).text());
+
+            if (watch == 0) {
+                $('[data-index=' + index + '].watch').addClass("text-danger");
+            } else if (watch >= 6) {
+                $('[data-index=' + index + '].watch').addClass("text-success");
+            }
+        })
+
+        // 増減率の表示
+        $(".input_price").each(function () {
+
+            let index = $(this).attr("data-index");
+            let input_price = $(this).val();
+            let buyout_price = $('[data-index=' + index + '].buyout_price').text();
+            buyout_price = Number(buyout_price.split(',').join(''));
+
+            // 小数点以下を切り捨てて、増減率を算出
+            range = (input_price / buyout_price - 1) * 100;
+            range = Math.floor(range);
+
+            // 増減率のテキスト表示
+            $('[data-index=' + index + '].range').text(range + "%");
+
+            // 増減率の絶対値が30以上なら赤、0なら黄色に変更
+            if (Math.abs(range) >= 30) {
+                $('[data-index=' + index + '].range').addClass("text-danger");
+                $('[data-index=' + index + '].input_price').css('background-color', '#FC9592');
+            } else if (Math.abs(range == 0)) {
+                $('[data-index=' + index + '].input_price').css('background-color', '#FFFF00');
+            }
+
+        })
 
     })
 
