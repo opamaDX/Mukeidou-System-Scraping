@@ -34,11 +34,19 @@ $(function () {
                     }
                 }
 
+                /*
+                Start ( Test Code 商品名トリム表示 )
+
+
+
                 test = items[key]["product_name"].trim().replace(/\s+/g, "");
-                console.log(test);
+
+
+                End
+                */
 
                 // htmlカード挿入
-                html += getRow(cnt, key, items[key], discount_price,test);
+                html += getRow(cnt, key, items[key], discount_price);
                 cnt++;
             }
 
@@ -94,18 +102,18 @@ $(function () {
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
             <div class="top_image" style="position: relative;">
-                <img class="card-img-top" src=${item["src"]}>
-                <button type="button" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
+                <img class="card-img-top" src=${item["src"]} data-index=${cnt}>
+                <button type="button" tabindex="-1" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
-                    <a href="javascript:void(0)" tabindex="-1" onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${test}</a>
+                    <a href="javascript:void(0)" tabindex="-1" class="product_name" data-url=${item["url"]} data-index=${cnt} onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"]}</a>
                 </h6>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item py-1">終了日時<span class="float-right">${item["end_time"]}</span></li>
+                <li class="list-group-item py-1">終了日時<span class="end_time float-right" data-index=${cnt} >${item["end_time"]}</span></li>
                 <li class="list-group-item py-1">管理番号<span class="float-right product_number" data-index=${cnt} data-clipboard-text="${key}">${key}</span></li>
-                <li class="list-group-item py-1">アクセス<span class="float-right">${item["access"]}</span></li>
+                <li class="list-group-item py-1">アクセス<span class="float-right access" data-index=${cnt}>${item["access"]}</span></li>
                 <li class="list-group-item py-1"><span class="">ウォッチ</span><span style="font-size: 1rem;" class="float-right watch font-weight-bold" data-index=${cnt}>${item["watch"]}</span></li>
                 <li class="list-group-item py-1"><span class="">即決価格</span><span style="font-size: 1rem;" class="float-right font-weight-bold buyout_price" data-index=${cnt}>${Number(item["price"]).toLocaleString()}</span></li>
                 <li class="list-group-item">
