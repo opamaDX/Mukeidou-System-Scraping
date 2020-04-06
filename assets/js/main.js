@@ -126,6 +126,7 @@ $(function () {
 
         $(".input_price").each(function () {
 
+            // 製品情報の取得
             let index = $(this).attr("data-index");
             let src = $('[data-index=' + index + '].card-img-top').attr("src");
             let url = $('[data-index=' + index + '].product_name').attr("data-url");
@@ -139,6 +140,7 @@ $(function () {
             buyout_price = buyout_price.split(',').join('').trim();
             let input_price = $('[data-index=' + index + '].input_price').val();
             let range = $('[data-index=' + index + '].range').text();
+            let flag = $('[data-index=' + index + '].card_number').attr("data-flag");
 
             var item = {
                 "index": index,
@@ -151,7 +153,8 @@ $(function () {
                 "buyout_price": buyout_price,
                 "input_price": input_price,
                 "range": range,
-                "url": url
+                "url": url,
+                "flag": flag
             };
 
             items.push(item);
@@ -217,11 +220,24 @@ $(function () {
             } else if (Math.abs(range == 0)) {
                 $('[data-index=' + index + '].input_price').css('background-color', '#FFFF00');
             }
+        })
 
+        // flagの値に応じて、チェックボックスの色を変更
+        $(".card_number").each(function () {
+
+            // カードの管理番号とflagを取得
+            let index = $(this).attr("data-index");
+            let flag = $(this).attr("data-flag");
+
+            if (flag == 0) {
+                $('[data-index=' + index + '].card_number').addClass("btn-danger");
+                $('[data-index=' + index + '].card_number').attr('data-flag', 0)
+            }
         })
 
     })
 
+    // 各種ソート機能
     function sort_by(sort, items) {
 
         if (sort == "watch") {
@@ -249,7 +265,7 @@ $(function () {
         <div class="card">
             <div class="top_image" style="position: relative;">
                 <img class="card-img-top" src=${item["src"]} data-index=${cnt}>
-                <button type="button" tabindex="-1" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
+                <button type="button" tabindex="-1" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=${item["flag"]} data-index=${cnt}>${cnt}</button>
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
