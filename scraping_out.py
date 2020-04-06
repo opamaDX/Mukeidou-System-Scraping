@@ -13,22 +13,28 @@ driver = webdriver.Chrome()
 json_file   = open('edit.json', 'r', encoding = 'utf-8')
 edit_object = json.load(json_file)
 
-# hour = edit_object["date"]
+hour = edit_object["date"]
 error_number = 0
-
+id_pass = True
 # 例外処理が発生した時はその商品のデータを飛ばし次の商品に移行
 
 for key in edit_object:
-    if 'relist_url' in key.keys():
+    if key == "date":
         try:
             # オークションIDを参照してURLを開く
-            # driver.get(edit_object[key]['relist_url'])
+            driver.get(edit_object[key]['relist_url'])
             # 上と下どっちが正しい？？
-            driver.get(key['relist_url'])
+            # driver.get(key['relist_url'])
             # 画面最大化
             driver.maximize_window()
-            
             # ボタンが表示されるまで待機
+            if id_pass == True:
+                driver.find_element_by_id('username').send_keys("")
+                driver.find_element_by_id('btnNext').click()
+                sleep(2)
+                driver.find_element_by_id('passwd').send_keys("")
+                driver.find_element_by_id('btnSubmit').click()
+                sleep(3)
             wait = WebDriverWait(driver, 10)
             wait.until(EC.element_to_be_clickable((By.ID, 'auc_insertion_ok')))
 
@@ -42,9 +48,9 @@ for key in edit_object:
             # 即決価格削除
             price.clear()
             # 即決価格修正
-            # driver.find_element_by_id('auc_BidOrBuyPrice').send_keys(edit_object[key]["price"])
+            driver.find_element_by_id('auc_BidOrBuyPrice').send_keys(edit_object[key]["price"])
             # 上と下どっちが正しい？？
-            driver.find_element_by_id('auc_BidOrBuyPrice').send_keys(key["price"])
+            # driver.find_element_by_id('auc_BidOrBuyPrice').send_keys(key["price"])
             #ドロップダウン
             # 普通に取得する
             closing_time = driver.find_element_by_id('ClosingTime')
@@ -56,10 +62,10 @@ for key in edit_object:
             closing_time_select.select_by_value(hour)
 
             # 確認画面へ
-            driver.find_element_by_id('auc_submit1').click()
-
+            # driver.find_element_by_id('auc_submit1').click()
+            id_pass = False
             time.sleep(3)
-        # 今現在全ての例外処理に対応しているので対応した例外処理に変更する
+    # 今現在全ての例外処理に対応しているので対応した例外処理に変更する
         except:
             print(edit_object[key])
             error_number += 1
