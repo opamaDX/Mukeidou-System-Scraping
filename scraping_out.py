@@ -27,10 +27,10 @@ for key in edit_object:
             driver.maximize_window()
 
             if id_pass == True:
-                driver.find_element_by_id('username').send_keys("mukeidou")
+                driver.find_element_by_id('username').send_keys("")
                 driver.find_element_by_id('btnNext').click()
                 sleep(2)
-                driver.find_element_by_id('passwd').send_keys("n@748sps")
+                driver.find_element_by_id('passwd').send_keys("")
                 driver.find_element_by_id('btnSubmit').click()
                 sleep(3)
             
@@ -51,22 +51,22 @@ for key in edit_object:
             driver.find_element_by_id('auc_BidOrBuyPrice').send_keys(edit_object[key]["price"])
             #ドロップダウン
             # 普通に取得する
-            # closing_time = driver.find_element_by_id('ClosingTime')
+            closing_time = driver.find_element_by_id('ClosingTime')
 
             # 取得したエレメントをSelectタグに対応したエレメントに変化させる
-            # closing_time_select = Select(closing_time)
+            closing_time_select = Select(closing_time)
 
             # 選択したいvalueを指定する
-            # closing_time_select.select_by_value(hour)
+            closing_time_select.select_by_value(hour)
 
             # 確認画面へ
-            # driver.find_element_by_id('auc_submit1').click()
+            driver.find_element_by_id('auc_submit1').click()
 
             id_pass = False
             time.sleep(3)
     # 今現在全ての例外処理に対応しているので対応した例外処理に変更する
         except:
-            print(key)
+            print(edit_object[key]['ID'])
             error_number += 1
             sleep(3)
             pass
