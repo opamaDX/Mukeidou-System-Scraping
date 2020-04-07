@@ -12,10 +12,10 @@ driver = webdriver.Chrome()
 driver.get('https://order.auctions.yahoo.co.jp/jp/show/mystatus?select=closed&hasWinner=0')
 driver.maximize_window()
 
-driver.find_element_by_id('username').send_keys("mukeidou")
+driver.find_element_by_id('username').send_keys("")
 driver.find_element_by_id('btnNext').click()
 sleep(2)
-driver.find_element_by_id('passwd').send_keys("n@748sps")
+driver.find_element_by_id('passwd').send_keys("")
 driver.find_element_by_id('btnSubmit').click()
 sleep(3)
 
