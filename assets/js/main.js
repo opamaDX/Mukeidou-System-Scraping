@@ -61,7 +61,7 @@ $(function () {
             let id = $('[data-index=' + index + '].product_name').attr("data-id");
             let product_number = $('[data-index=' + index + '].product_number').text();
             let flag = $('[data-index=' + index + '].card_number').attr('data-flag');
-            let relist_url = $('[data-index=' + index + '].product_name').attr("data_relist_url");
+            let relist_url = $('[data-index=' + index + '].product_name').attr("data-relist-url");
 
             // 増減率が1つでも赤色の場合、処理を中断
             let range = $('[data-index=' + index + '].range').attr("class");
@@ -135,7 +135,7 @@ $(function () {
             let index = $(this).attr("data-index");
             let src = $('[data-index=' + index + '].card-img-top').attr("src");
             let url = $('[data-index=' + index + '].product_name').attr("data-url");
-            let data_relist_url = $('[data-index=' + index + '].product_name').attr("data_relist_url");
+            let data_relist_url = $('[data-index=' + index + '].product_name').attr("data-relist-url");
             let product_name = $('[data-index=' + index + '].product_name').text();
             let end_time = $('[data-index=' + index + '].end_time').text();
             end_time = end_time.replace(/-/g, '/');
@@ -263,13 +263,15 @@ $(function () {
             })
         } else if (sort == "end_time") {
             items.sort(function (a, b) {
-                return (a.date < b.date ? 1 : -1);
+                return (a.end_time < b.end_time ? 1 : -1);
             })
         }
     }
 
     // 表示するhtml
     function getRowSorting(cnt, key, item) {
+        console.log( item["data_relist_url"] );
+        // console.log( item );
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
             <div class="top_image" style="position: relative;">
@@ -278,7 +280,7 @@ $(function () {
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
-                    <a href="javascript:void(0)" tabindex="-1" class="product_name" data-id=${item["id"]} data_relist_url=${item["relist_url"]} data-url=${item["url"]} data-index=${cnt} onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"]}</a>
+                    <a href="javascript:void(0)" tabindex="-1" class="product_name" data-id=${item["id"]} data-relist-url=${item["data_relist_url"]} data-url=${item["url"]} data-index=${cnt} onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"]}</a>
                 </h6>
             </div>
             <ul class="list-group list-group-flush">
