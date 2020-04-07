@@ -58,8 +58,10 @@ $(function () {
         $(".input_price").each(function () {
             let index = $(this).attr("data-index");
             let input_price = $(this).val();
+            let id = $('[data-index=' + index + '].product_name').attr("data-id");
             let product_number = $('[data-index=' + index + '].product_number').text();
             let flag = $('[data-index=' + index + '].card_number').attr('data-flag');
+            let relist_url = $('[data-index=' + index + '].product_name').attr("data_relist_url");
 
             // 増減率が1つでも赤色の場合、処理を中断
             let range = $('[data-index=' + index + '].range').attr("class");
@@ -72,11 +74,14 @@ $(function () {
             if (flag == 1) {
                 return_items[product_number] = {};
                 return_items[product_number]["price"] = input_price;
+                return_items[product_number]["id"] = id;
+                return_items[product_number]["relist_url"] = relist_url;
             }
         })
 
         // セレクト指定した日時を配列に追加
-        return_items["date"] = "2020年4月2日（テスト）"
+        var select_value = $("#select_time").val();
+        return_items["select_value"] = select_value;
 
         // json形式に変換
         var json = JSON.stringify(return_items);
@@ -130,10 +135,12 @@ $(function () {
             let index = $(this).attr("data-index");
             let src = $('[data-index=' + index + '].card-img-top').attr("src");
             let url = $('[data-index=' + index + '].product_name').attr("data-url");
+            let data_relist_url = $('[data-index=' + index + '].product_name').attr("data_relist_url");
             let product_name = $('[data-index=' + index + '].product_name').text();
             let end_time = $('[data-index=' + index + '].end_time').text();
             end_time = end_time.replace(/-/g, '/');
             let product_number = $('[data-index=' + index + '].product_number').text();
+            let id = $('[data-index=' + index + '].product_name').attr("data-id");
             let access = $('[data-index=' + index + '].access').text();
             let watch = $('[data-index=' + index + '].watch').text();
             let buyout_price = $('[data-index=' + index + '].buyout_price').text();
@@ -146,6 +153,7 @@ $(function () {
                 "index": index,
                 "src": src,
                 "product_name": product_name,
+                "id":id,
                 "end_time": end_time,
                 "product_number": product_number,
                 "access": access,
@@ -154,7 +162,8 @@ $(function () {
                 "input_price": input_price,
                 "range": range,
                 "url": url,
-                "flag": flag
+                "flag": flag,
+                "data_relist_url":data_relist_url
             };
 
             items.push(item);
@@ -269,7 +278,7 @@ $(function () {
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
-                    <a href="javascript:void(0)" tabindex="-1" class="product_name" data-url=${item["url"]} data-index=${cnt} onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"]}</a>
+                    <a href="javascript:void(0)" tabindex="-1" class="product_name" data-id=${item["id"]} data_relist_url=${item["relist_url"]} data-url=${item["url"]} data-index=${cnt} onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"]}</a>
                 </h6>
             </div>
             <ul class="list-group list-group-flush">
