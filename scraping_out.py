@@ -32,6 +32,7 @@ for key in edit_object:
                 sleep(2)
                 driver.find_element_by_id('passwd').send_keys("n@748sps")
                 driver.find_element_by_id('btnSubmit').click()
+                id_pass = False
                 sleep(3)
             
             # ボタンが表示されるまで待機
@@ -62,7 +63,6 @@ for key in edit_object:
             # 確認画面へ
             # driver.find_element_by_id('auc_submit1').click()
 
-            id_pass = False
             time.sleep(3)
     # 今現在全ての例外処理に対応しているので対応した例外処理に変更する
         except:
