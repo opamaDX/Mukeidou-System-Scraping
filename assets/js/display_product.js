@@ -96,7 +96,7 @@ $(function () {
             </div>
             <div class="card-body p-1">
                 <h6 class="card-title text-center py-1 mb-0">
-                    <a href="javascript:void(0)" tabindex="-1" class="product_name" data-id=${item["ID"]} data_relist_url=${item["relist_url"]} data-url=${item["detail_URL"]} data-index=${cnt} onClick="window.open('${item["detail_URL"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"].slice(0,40)}</a>
+                    <a href="javascript:void(0)" tabindex="-1" class="product_name" data-id=${item["ID"]} data-relist-url=${item["relist_url"]} data-url=${item["detail_URL"]} data-index=${cnt} onClick="window.open('${item["detail_URL"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"].slice(0,40)}</a>
                 </h6>
             </div>
             <ul class="list-group list-group-flush">
