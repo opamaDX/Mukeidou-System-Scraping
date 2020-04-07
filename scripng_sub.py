@@ -9,14 +9,13 @@ from time import sleep
 from datetime import datetime
 
 driver = webdriver.Chrome()
-# driver.get('file:///C:/workspace/mukeidou/必要なもの/code1.html')
 driver.get('https://order.auctions.yahoo.co.jp/jp/show/mystatus?select=closed&hasWinner=0')
 driver.maximize_window()
 
-driver.find_element_by_id('username').send_keys("")
+driver.find_element_by_id('username').send_keys("mukeidou")
 driver.find_element_by_id('btnNext').click()
 sleep(2)
-driver.find_element_by_id('passwd').send_keys("")
+driver.find_element_by_id('passwd').send_keys("n@748sps")
 driver.find_element_by_id('btnSubmit').click()
 sleep(3)
 
@@ -37,10 +36,7 @@ first_time   = datetime(2020, 4, 4, 20)
 last_time    = datetime(2020, 4, 4, 21)
 
 
-# 落札者なしで終了日時を20時から21時に条件分岐したurlをすべて取得
-# for文で回しても取得することができる可能性がある
-# while product_min_number < product_max_number:
-while product_min_number < 5:
+while product_min_number < product_max_number:
 
     # 1ページ目のurl獲得が終了したら次のページに遷移する
     if table_tr_number > 51:
@@ -57,9 +53,8 @@ while product_min_number < 5:
     tmp               = str(current_time.year) + '年' + end_time
     within_range_time = datetime.strptime(tmp, '%Y年%m月%d日 %H時%M分')
     
-    # 終了日時で当日の20時から21時の条件で絞ったurlを一つずつリストに格納
+    # 終了日時の条件で絞ったurlを一つずつリストに格納
     # if within_range_time >= first_time and within_range_time <= last_time:
-
     url_item = driver.find_element_by_xpath('//*[@id="acWrContents"]/div/table/tbody/tr/td/table/tbody/tr[3]/td/form/table[1]/tbody/tr[' + str(table_tr_number) + ']/td[3]/a').get_attribute('href')
     url_lists.append(url_item)
         
@@ -93,27 +88,18 @@ for url in url_lists:
         # 詳細ページのURL
         detail_URL = url
 
-        # elementの取得
-
-        # value = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div[2]/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text.replace("円", "")
-        # value = driver.find_element_by_css_selector('.decTxtBuyPrice').text.replace("円", "")
-
         # JavaScriptから取得
         # 価格
         price      = driver.execute_script("return pageData.items.price")
-        # price      = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[1]/tbody/tr/td[2]/div/table/tbody/tr[1]/td[2]/table/tbody/tr/td/p[1]').text
         # 開始日時
         start_time = driver.execute_script("return pageData.items.starttime")
-        # start_time = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[4]/td[2]').text
         # 終了日時
         end_time   = driver.execute_script("return pageData.items.endtime")
-        # end_time   = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[5]/td[2]').text
         # オークションID
         ID         = driver.execute_script("return pageData.items.productID")
-        # ID         = driver.find_element_by_xpath('//*[@id="modPdtInfoB"]/div[2]/table[2]/tbody/tr/td[2]/div/table/tbody/tr[9]/td[2]').text
         product_name = driver.execute_script("return pageData.items.productName")
+
         # xpath
-        
         # アクセス総数の数値
         access       = driver.find_element_by_xpath('//*[@id="l-sub"]/div[1]/ul/li[2]/dl/dd/ul/li[1]/span[2]').text
         # ウォッチリストに追加された数値
@@ -139,8 +125,7 @@ for url in url_lists:
 
         # 商品一覧ディクショナリ
         product_lists[product_id] = product_list
-        # product_lists[ID] = product_list
-        # print(product_lists)
+        print(product_lists)
 
         sleep(3)
             
@@ -153,7 +138,7 @@ for url in url_lists:
 
 # 受け取った値をjson形式のファイルに格納してファイルを閉じる
 fw = open('items.json', 'w', encoding = 'utf-8')
-json.dump(product_lists, fw, ensure_ascii = False, indent = 4)
+json.dump(product_lists, fw, ensure_ascii = False)
 fw.close()
 
 print('エラー' + str(error_number) + '件')
