@@ -270,8 +270,6 @@ $(function () {
 
     // 表示するhtml
     function getRowSorting(cnt, key, item) {
-        console.log( item["data_relist_url"] );
-        // console.log( item );
         return `<div class="col-lg-2 col-md-2 col-sm-12 mb-4 mt-4 small">
         <div class="card">
             <div class="top_image" style="position: relative;">

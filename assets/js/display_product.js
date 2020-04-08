@@ -94,7 +94,7 @@ $(function () {
                 <img class="card-img-top" src=${item["src"]} data-index=${cnt}>
                 <button type="button" tabindex="-1" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=1 data-index=${cnt}>${cnt}</button>
             </div>
-            <div class="card-body p-1">
+            <div class="card-body p-1" style="height: 90px;">
                 <h6 class="card-title text-center py-1 mb-0">
                     <a href="javascript:void(0)" tabindex="-1" class="product_name" data-id=${item["ID"]} data-relist-url=${item["relist_url"]} data-url=${item["detail_URL"]} data-index=${cnt} onClick="window.open('${item["detail_URL"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"].slice(0,40)}</a>
                 </h6>
