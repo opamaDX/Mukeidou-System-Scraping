@@ -30,10 +30,11 @@ product_max_number = int(driver.find_element_by_xpath('//*[@id="acWrContents"]/d
 
 # 自由に時間を設定することができる
 current_time = datetime.now()
-# first_time   = datetime(current_time.year, current_time.month, current_time.day, 20)
-# last_time    = datetime(current_time.year, current_time.month, current_time.day, 21)
-first_time   = datetime(2020, 4, 4, 20)
-last_time    = datetime(2020, 4, 4, 21)
+# 時間変更は24時間表記で変更できます
+first_time   = datetime(current_time.year, current_time.month, current_time.day, 20)
+last_time    = datetime(current_time.year, current_time.month, current_time.day, 21)
+# first_time   = datetime(2020, 4, 7, 8)
+# last_time    = datetime(2020, 4, 7, 9)
 
 
 while product_min_number < product_max_number:

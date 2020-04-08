@@ -10,19 +10,19 @@ from time import sleep
 driver = webdriver.Chrome()
 
 # 編集したjson形式のファイルを開く
-json_file   = open('items.json', 'r', encoding = 'utf-8')
+json_file   = open('edit.json', 'r', encoding = 'utf-8')
 edit_object = json.load(json_file)
 
-# hour = edit_object["date"]
+hour = edit_object["select_value"]
 error_number = 0
 id_pass = True
 
 # 例外処理が発生した時はその商品のデータを飛ばし次の商品に移行
 for key in edit_object:
-    if key != "date":
+    if key != "select_value":
         try:
             # オークションIDを参照してURLを開く
-            driver.get(edit_object[key]['url'])
+            driver.get(edit_object[key]['relist_url'])
             # 画面最大化
             driver.maximize_window()
 
@@ -32,6 +32,7 @@ for key in edit_object:
                 sleep(2)
                 driver.find_element_by_id('passwd').send_keys("")
                 driver.find_element_by_id('btnSubmit').click()
+                id_pass = False
                 sleep(3)
             
             # ボタンが表示されるまで待機
@@ -41,7 +42,7 @@ for key in edit_object:
             # 初めのボタンクリック
             driver.find_element_by_id('auc_insertion_ok').click()
             #オークションID取得
-            ID         = driver.find_element_by_name('aID').get_attribute('value')
+            # ID         = driver.find_element_by_name('aID').get_attribute('value')
 
             # 即決価格を選択
             price = driver.find_element_by_id('auc_BidOrBuyPrice')
@@ -60,13 +61,12 @@ for key in edit_object:
             closing_time_select.select_by_value(hour)
 
             # 確認画面へ
-            driver.find_element_by_id('auc_submit1').click()
+            # driver.find_element_by_id('auc_submit1').click()
 
-            id_pass = False
             time.sleep(3)
     # 今現在全ての例外処理に対応しているので対応した例外処理に変更する
         except:
-            print(edit_object[key]['ID'])
+            print(edit_object[key]['id'])
             error_number += 1
             sleep(3)
             pass
