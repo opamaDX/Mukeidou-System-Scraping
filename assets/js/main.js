@@ -265,6 +265,22 @@ $(function () {
             items.sort(function (a, b) {
                 return (a.end_time < b.end_time ? 1 : -1);
             })
+        } else if (sort == "access_up") {
+            items.sort(function (a, b) {
+                return a.access - b.access;
+            })
+        } else if (sort == "buyout_price_up") {
+            items.sort(function (a, b) {
+                return a.buyout_price - b.buyout_price;
+            })
+        } else if (sort == "end_time_up") {
+            items.sort(function (a, b) {
+                return (b.end_time < a.end_time ? 1 : -1);
+            })
+        } else if (sort == "watch_up") {
+            items.sort(function (a, b) {
+                return a.watch - b.watch;
+            })
         }
     }
 
@@ -276,7 +292,7 @@ $(function () {
                 <img class="card-img-top" src=${item["src"]} data-index=${cnt}>
                 <button type="button" tabindex="-1" style="position: absolute; top:0; left: 0;" class="btn btn-primary rounded-0 card_number" data-flag=${item["flag"]} data-index=${cnt}>${cnt}</button>
             </div>
-            <div class="card-body p-1">
+            <div class="card-body p-1" style="height: 90px;">
                 <h6 class="card-title text-center py-1 mb-0">
                     <a href="javascript:void(0)" tabindex="-1" class="product_name" data-id=${item["id"]} data-relist-url=${item["data_relist_url"]} data-url=${item["url"]} data-index=${cnt} onClick="window.open('${item["url"]}','sub','width=700,height=400,scrollbars=yes')">${item["product_name"]}</a>
                 </h6>
